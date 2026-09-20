@@ -1,0 +1,40 @@
+name: Publish Packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish-npm:
+    name: Publish @knowthankyew/privacy-telemetry (npm)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm --workspace=@knowthankyew/privacy-telemetry run build
+      - run: npm --workspace=@knowthankyew/privacy-telemetry publish --provenance --access public
+
+  publish-nuget:
+    name: Publish KnowThankYew.Privacy.Telemetry (NuGet)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: NuGet Login (OIDC)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: knowthankyew
+      - run: dotnet pack packages/KnowThankYew.Privacy.Telemetry/KnowThankYew.Privacy.Telemetry.csproj -c Release -o artifacts
+      - run: dotnet nuget push "artifacts/*.nupkg" --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
