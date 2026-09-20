@@ -1,7 +1,7 @@
-node_modules
-dist
-.turbo
-artifacts
+node_modules/
+**/node_modules/
+.turbo/
+artifacts/
 bin/
 obj/
 *.user
