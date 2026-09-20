@@ -56,9 +56,13 @@ jobs:
         run: dotnet pack packages/KnowThankYew.Privacy.Telemetry/KnowThankYew.Privacy.Telemetry.csproj -c Release -o artifacts
 
   sbom:
-    name: Generate CycloneDX SBOM
+    name: Generate & Attest CycloneDX SBOM
     runs-on: ubuntu-latest
     needs: [validate-ts, validate-dotnet]
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout Code
@@ -69,11 +73,24 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install Cosign (Sigstore)
+        uses: sigstore/cosign-installer@v3
+
       - name: Generate CycloneDX SBOM
         run: npx --yes @cyclonedx/cdxgen -o bom.json
 
-      - name: Upload SBOM Artifact
+      - name: Keyless Cryptographic Signing with Cosign (Pillar 5)
+        run: cosign sign-blob --yes --bundle bom.json.bundle bom.json
+
+      - name: Attest SBOM Provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 'bom.json'
+
+      - name: Upload SBOM & Signature Bundle Artifact
         uses: actions/upload-artifact@v7
         with:
           name: sbom-privacy-telemetry-cyclonedx
-          path: bom.json
+          path: |
+            bom.json
+            bom.json.bundle

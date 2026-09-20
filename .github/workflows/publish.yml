@@ -8,6 +8,7 @@ on:
 permissions:
   contents: read
   id-token: write
+  attestations: write
 
 jobs:
   publish-npm:
@@ -37,4 +38,8 @@ jobs:
         with:
           user: knowthankyew
       - run: dotnet pack packages/KnowThankYew.Privacy.Telemetry/KnowThankYew.Privacy.Telemetry.csproj -c Release -o artifacts
+      - name: Attest Build Provenance (Pillar 5 Supply Chain)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 'artifacts/*.nupkg'
       - run: dotnet nuget push "artifacts/*.nupkg" --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
