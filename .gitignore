@@ -1,0 +1,12 @@
+node_modules
+dist
+.turbo
+artifacts
+bin/
+obj/
+*.user
+*.suo
+*.nupkg
+.DS_Store
+*.log
+coverage/

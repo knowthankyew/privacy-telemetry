@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-ts:
+    name: Build & Test TypeScript npm Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Audit Dependencies
+        run: npm audit --audit-level=high
+
+      - name: Run Vitest Suite
+        run: npm run test
+
+      - name: Build TypeScript Package
+        run: npm run build
+
+  validate-dotnet:
+    name: Build & Test .NET NuGet Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore .NET Dependencies
+        run: dotnet restore PrivacyTelemetry.slnx
+
+      - name: Run .NET Unit Tests
+        run: dotnet test PrivacyTelemetry.slnx --no-restore
+
+      - name: Pack NuGet Package
+        run: dotnet pack packages/KnowThankYew.Privacy.Telemetry/KnowThankYew.Privacy.Telemetry.csproj -c Release -o artifacts
+
+  sbom:
+    name: Generate CycloneDX SBOM
+    runs-on: ubuntu-latest
+    needs: [validate-ts, validate-dotnet]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Generate CycloneDX SBOM
+        run: npx --yes @cyclonedx/cdxgen -o bom.json
+
+      - name: Upload SBOM Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-privacy-telemetry-cyclonedx
+          path: bom.json

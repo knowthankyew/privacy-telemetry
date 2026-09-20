@@ -1,0 +1,15 @@
+{
+  "name": "@knowthankyew/privacy-telemetry-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/privacy-telemetry"
+  ],
+  "scripts": {
+    "build": "npm --workspace=@knowthankyew/privacy-telemetry run build && dotnet build PrivacyTelemetry.slnx",
+    "test": "npm --workspace=@knowthankyew/privacy-telemetry run test && dotnet test PrivacyTelemetry.slnx",
+    "pack:npm": "npm --workspace=@knowthankyew/privacy-telemetry pack",
+    "pack:dotnet": "dotnet pack packages/KnowThankYew.Privacy.Telemetry/KnowThankYew.Privacy.Telemetry.csproj -c Release -o artifacts"
+  }
+}

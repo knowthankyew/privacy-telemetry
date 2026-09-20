@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/packages/">
+    <Project Path="packages/KnowThankYew.Privacy.Telemetry/KnowThankYew.Privacy.Telemetry.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/KnowThankYew.Privacy.Telemetry.Tests/KnowThankYew.Privacy.Telemetry.Tests.csproj" />
+  </Folder>
+</Solution>
