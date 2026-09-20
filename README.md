@@ -31,7 +31,7 @@ TypeScript & React package for client-side web applications.
 - `IPrivacyTelemetry` interface & `PrivacyTelemetryService`
 - Thread-safe in-memory buffer (`ConcurrentQueue`) with burn routine
 - Native BCL `ActivitySource` & `Activity` tag sanitization
-- Configuration models adhering to `PRIVACY_TELEMETRY_SCHEMA.md`
+- Configuration models adhering to [PRIVACY_TELEMETRY_SCHEMA.md](./PRIVACY_TELEMETRY_SCHEMA.md)
 - ASP.NET Core dependency injection (`AddPrivacyTelemetry`) & endpoint mapping (`MapPrivacyTelemetryEndpoints`)
 
 ---
