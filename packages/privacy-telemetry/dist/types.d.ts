@@ -67,4 +67,13 @@ export interface PrivacyClaimsBranding {
     enterpriseFooterSubtext?: string;
     domainDisclaimerClause?: string;
 }
+declare global {
+    interface ImportMetaEnv {
+        VITE_OTEL_EXPORTER_OTLP_ENDPOINT?: string;
+        [key: string]: string | undefined;
+    }
+    interface ImportMeta {
+        readonly env: ImportMetaEnv;
+    }
+}
 //# sourceMappingURL=types.d.ts.map

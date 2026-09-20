@@ -30,17 +30,21 @@ export class TelemetryManager {
     customConfig?: Partial<TelemetryConfig>,
     additionalAllowlistKeys?: Iterable<string>
   ) {
-    const metaObj =
-      typeof import.meta !== 'undefined'
-        ? (import.meta as unknown as { env?: Record<string, string> })
-        : undefined;
-    const globalObj =
-      typeof globalThis !== 'undefined'
-        ? (globalThis as unknown as { process?: { env?: Record<string, string> } })
-        : undefined;
-    const envEndpoint =
-      metaObj?.env?.VITE_OTEL_EXPORTER_OTLP_ENDPOINT ||
-      globalObj?.process?.env?.OTEL_EXPORTER_OTLP_ENDPOINT;
+    let envEndpoint: string | undefined;
+    try {
+      // Direct literal AST expression allows bundlers (Vite/Rollup) to perform compile-time dead-code elimination
+      envEndpoint = import.meta.env.VITE_OTEL_EXPORTER_OTLP_ENDPOINT;
+    } catch {
+      // Fallback for non-ESM runtimes
+    }
+
+    if (!envEndpoint) {
+      const globalObj =
+        typeof globalThis !== 'undefined'
+          ? (globalThis as unknown as { process?: { env?: Record<string, string> } })
+          : undefined;
+      envEndpoint = globalObj?.process?.env?.OTEL_EXPORTER_OTLP_ENDPOINT;
+    }
 
     const defaultMode: TelemetryMode = envEndpoint ? 'otlp' : 'memory_only';
 

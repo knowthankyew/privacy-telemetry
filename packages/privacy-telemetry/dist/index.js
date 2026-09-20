@@ -105,19 +105,24 @@ var a = class {
 	sanitizer;
 	allowlist;
 	constructor(e, r) {
-		let i = import.meta, a = typeof globalThis < "u" ? globalThis : void 0, o = i?.env?.VITE_OTEL_EXPORTER_OTLP_ENDPOINT || a?.process?.env?.OTEL_EXPORTER_OTLP_ENDPOINT, s = o ? "otlp" : "memory_only";
+		let i;
+		try {
+			i = void 0;
+		} catch {}
+		i ||= (typeof globalThis < "u" ? globalThis : void 0)?.process?.env?.OTEL_EXPORTER_OTLP_ENDPOINT;
+		let a = i ? "otlp" : "memory_only";
 		this.config = {
-			mode: s,
-			otlpEndpoint: o || null,
+			mode: a,
+			otlpEndpoint: i || null,
 			allowRawPayloads: !1,
 			burnEnabled: !0,
 			auditDurable: !1,
-			networkEgress: s === "otlp" ? "allow_otlp" : "deny",
+			networkEgress: a === "otlp" ? "allow_otlp" : "deny",
 			serviceName: "knowthankyew-app",
 			...e
 		};
-		let { allowlist: c, sanitize: l } = t(r);
-		this.allowlist = c, this.sanitizer = l, this.memoryExporter = new n();
+		let { allowlist: o, sanitize: s } = t(r);
+		this.allowlist = o, this.sanitizer = s, this.memoryExporter = new n();
 	}
 	getConfig() {
 		return this.config;
