@@ -36,6 +36,14 @@
   ],
   "author": "knowthankyew Contributors",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/knowthankyew/privacy-telemetry.git",
+    "directory": "packages/privacy-telemetry"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
