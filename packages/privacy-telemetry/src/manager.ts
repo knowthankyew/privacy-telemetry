@@ -148,8 +148,23 @@ export class TelemetryManager {
     return this.memoryExporter.getSpans();
   }
 
+  public getMemorySpans(): readonly SpanRecord[] {
+    return this.memoryExporter.getSpans();
+  }
+
   public getAuditLog(): readonly SessionAuditEvent[] {
     return this.auditLog;
+  }
+
+  public downloadSessionAuditJson(): string {
+    const exportData = {
+      generatedAt: new Date().toISOString(),
+      service: this.config.serviceName || 'knowthankyew-app',
+      telemetryMode: this.config.mode,
+      eventCount: this.auditLog.length,
+      events: this.auditLog,
+    };
+    return JSON.stringify(exportData, null, 2);
   }
 
   public getPrivacyAuditReport(): PrivacyAuditReport {
@@ -187,5 +202,9 @@ export class TelemetryManager {
     this.memoryExporter.clear();
     this.auditLog = [];
     this.isBurned = false;
+  }
+
+  public restartSession(): void {
+    this.reset();
   }
 }
