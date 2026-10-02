@@ -5,6 +5,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    assignees:
+      - "knowthankyew"
     groups:
       npm-dependencies:
         patterns:
@@ -26,6 +28,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    assignees:
+      - "knowthankyew"
     groups:
       nuget-dependencies:
         patterns:
@@ -36,6 +40,8 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    assignees:
+      - "knowthankyew"
     groups:
       github-actions:
         patterns:
