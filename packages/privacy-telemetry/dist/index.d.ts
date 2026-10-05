@@ -7,4 +7,5 @@ export * from './allowlist.js';
 export * from './exporter.js';
 export * from './claims.js';
 export * from './manager.js';
+export * from './handoff.js';
 //# sourceMappingURL=index.d.ts.map

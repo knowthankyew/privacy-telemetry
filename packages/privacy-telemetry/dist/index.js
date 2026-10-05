@@ -1,19 +1,20 @@
+import { n as e, t } from "./chunks/handoff-BaHIRjvl.js";
 //#region src/allowlist.ts
-var e = /* @__PURE__ */ new Set(/* @__PURE__ */ "rule_id.rule_ids.statute_code.jurisdiction.status.risk_level.duration_ms.duration_sec.clause_count.total_clauses.flagged_clauses.flagged_count.standard_count.watch_count.unenforceable_count.char_count.matched_violations.error_code.job_id.service.action.step.current_step.total_steps.progress_pct.loss.device.adapter_size_bytes.dataset_hash.exchange.routing_key".split("."));
-function t(t) {
-	let n = new Set(e);
-	if (t) for (let e of t) n.add(e.toLowerCase());
+var n = /* @__PURE__ */ new Set(/* @__PURE__ */ "rule_id.rule_ids.statute_code.jurisdiction.status.risk_level.duration_ms.duration_sec.clause_count.total_clauses.flagged_clauses.flagged_count.standard_count.watch_count.unenforceable_count.char_count.matched_violations.error_code.job_id.service.action.step.current_step.total_steps.progress_pct.loss.device.adapter_size_bytes.dataset_hash.exchange.routing_key".split("."));
+function r(e) {
+	let t = new Set(n);
+	if (e) for (let n of e) t.add(n.toLowerCase());
 	return {
-		allowlist: n,
-		sanitize: (e, t = !1) => {
+		allowlist: t,
+		sanitize: (e, n = !1) => {
 			let r = {};
 			for (let [i, a] of Object.entries(e)) {
 				let e = i.toLowerCase();
-				if (!n.has(e) && !t) {
+				if (!t.has(e) && !n) {
 					r[i] = "[REDACTED_BY_DEFAULT_ALLOWLIST]";
 					continue;
 				}
-				typeof a == "string" ? r[i] = a.length > 256 && !t ? `[TRUNCATED_HASH_${a.slice(0, 8)}...]` : a : (typeof a == "number" || typeof a == "boolean") && (r[i] = a);
+				typeof a == "string" ? r[i] = a.length > 256 && !n ? `[TRUNCATED_HASH_${a.slice(0, 8)}...]` : a : (typeof a == "number" || typeof a == "boolean") && (r[i] = a);
 			}
 			return r;
 		}
@@ -21,7 +22,7 @@ function t(t) {
 }
 //#endregion
 //#region src/exporter.ts
-var n = class {
+var i = class {
 	spans = [];
 	maxCapacity;
 	constructor(e = 500) {
@@ -40,7 +41,7 @@ var n = class {
 		return this.spans.length;
 	}
 };
-async function r(e, t, n = "knowthankyew-app") {
+async function a(e, t, n = "knowthankyew-app") {
 	if (typeof fetch < "u") try {
 		await fetch(e, {
 			method: "POST",
@@ -68,7 +69,7 @@ async function r(e, t, n = "knowthankyew-app") {
 }
 //#endregion
 //#region src/claims.ts
-function i(e, t) {
+function o(e, t) {
 	return e.isLocalOnlyHonest ? {
 		isLocalOnlyHonest: !0,
 		isEnterpriseBuild: !1,
@@ -97,23 +98,23 @@ function i(e, t) {
 }
 //#endregion
 //#region src/manager.ts
-var a = class {
+var s = class {
 	config;
 	memoryExporter;
 	auditLog = [];
 	isBurned = !1;
 	sanitizer;
 	allowlist;
-	constructor(e, r) {
-		let i;
+	constructor(e, t) {
+		let n;
 		try {
-			i = void 0;
+			n = void 0;
 		} catch {}
-		i ||= (typeof globalThis < "u" ? globalThis : void 0)?.process?.env?.OTEL_EXPORTER_OTLP_ENDPOINT;
-		let a = i ? "otlp" : "memory_only";
+		n ||= (typeof globalThis < "u" ? globalThis : void 0)?.process?.env?.OTEL_EXPORTER_OTLP_ENDPOINT;
+		let a = n ? "otlp" : "memory_only";
 		this.config = {
 			mode: a,
-			otlpEndpoint: i || null,
+			otlpEndpoint: n || null,
 			allowRawPayloads: !1,
 			burnEnabled: !0,
 			auditDurable: !1,
@@ -121,8 +122,8 @@ var a = class {
 			serviceName: "knowthankyew-app",
 			...e
 		};
-		let { allowlist: o, sanitize: s } = t(r);
-		this.allowlist = o, this.sanitizer = s, this.memoryExporter = new n();
+		let { allowlist: o, sanitize: s } = r(t);
+		this.allowlist = o, this.sanitizer = s, this.memoryExporter = new i();
 	}
 	getConfig() {
 		return this.config;
@@ -141,25 +142,25 @@ var a = class {
 			spanId: "noop",
 			end: () => {}
 		};
-		let n = `span_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`, i = Date.now(), a = this.sanitizeAttributes(t);
+		let n = `span_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`, r = Date.now(), i = this.sanitizeAttributes(t);
 		return {
 			spanId: n,
 			end: (t = "OK", o = {}) => {
 				if (this.config.mode === "disabled" || this.isBurned) return;
 				let s = Date.now(), c = {
-					...a,
+					...i,
 					...this.sanitizeAttributes(o)
 				}, l = {
 					id: n,
 					name: e,
-					startTime: i,
+					startTime: r,
 					endTime: s,
-					durationMs: s - i,
+					durationMs: s - r,
 					status: t,
 					attributes: c,
 					events: []
 				};
-				this.memoryExporter.export(l), this.config.mode === "otlp" && this.config.otlpEndpoint && r(this.config.otlpEndpoint, l, this.config.serviceName);
+				this.memoryExporter.export(l), this.config.mode === "otlp" && this.config.otlpEndpoint && a(this.config.otlpEndpoint, l, this.config.serviceName);
 			}
 		};
 	}
@@ -206,7 +207,7 @@ var a = class {
 		};
 	}
 	getPrivacyClaims(e) {
-		return i(this.getPrivacyAuditReport(), e);
+		return o(this.getPrivacyAuditReport(), e);
 	}
 	burn() {
 		this.config.burnEnabled && (this.memoryExporter.clear(), this.auditLog = [], this.isBurned = !0);
@@ -219,4 +220,4 @@ var a = class {
 	}
 };
 //#endregion
-export { e as DEFAULT_SAFE_ALLOWLIST_KEYS, n as MemoryExporter, a as TelemetryManager, t as createAllowlistSanitizer, r as exportToOtlp, i as getPrivacyClaims };
+export { n as DEFAULT_SAFE_ALLOWLIST_KEYS, t as KTY_HANDOFF_SESSION_KEY, i as MemoryExporter, s as TelemetryManager, r as createAllowlistSanitizer, a as exportToOtlp, o as getPrivacyClaims, e as validateHandoffPayload };

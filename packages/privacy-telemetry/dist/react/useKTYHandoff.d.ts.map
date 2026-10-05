@@ -1,0 +1,1 @@
+{"version":3,"file":"useKTYHandoff.d.ts","sourceRoot":"","sources":["../../src/react/useKTYHandoff.ts"],"names":[],"mappings":"AACA,OAAO,EACL,iBAAiB,EAGlB,MAAM,eAAe,CAAC;AAEvB,MAAM,WAAW,mBAAmB;IAClC,OAAO,EAAE,iBAAiB,GAAG,IAAI,CAAC;IAClC,eAAe,EAAE,OAAO,CAAC;IACzB,YAAY,EAAE,MAAM,IAAI,CAAC;CAC1B;AAED;;;;;;GAMG;AACH,wBAAgB,aAAa,CAAC,kBAAkB,CAAC,EAAE,MAAM,GAAG,mBAAmB,CAwF9E"}
