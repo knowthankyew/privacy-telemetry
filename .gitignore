@@ -10,3 +10,6 @@ obj/
 .DS_Store
 *.log
 coverage/
+
+# Agent Steering & Local Specs
+.kiro/
