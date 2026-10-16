@@ -53,6 +53,8 @@ const PROHIBITED_ALLOWLIST_KEYS = [
   'matchedSnippet',
   'clause_text',
   'password',
+  'adapter_path',
+  'dataset_relative_path',
 ];
 
 const REQUIRED_SHARED_ALLOWLIST_KEYS = [

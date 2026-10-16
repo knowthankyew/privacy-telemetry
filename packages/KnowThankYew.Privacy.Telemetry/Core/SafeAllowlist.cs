@@ -10,8 +10,8 @@ public sealed class SafeAllowlist
     public static readonly IReadOnlyCollection<string> DefaultKeys = new[]
     {
         "job_id", "status", "duration_ms", "duration_sec", "base_model", "dataset_hash",
-        "dataset_relative_path", "current_step", "total_steps", "progress_pct", "loss",
-        "device", "adapter_path", "adapter_size_bytes", "exchange", "routing_key",
+        "current_step", "total_steps", "progress_pct", "loss",
+        "device", "adapter_size_bytes", "exchange", "routing_key",
         "rule_id", "rule_ids", "statute_code", "jurisdiction", "risk_level",
         "clause_count", "total_clauses", "flagged_clauses", "flagged_count",
         "standard_count", "watch_count", "unenforceable_count", "char_count",
