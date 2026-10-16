@@ -347,11 +347,16 @@ export function auditCentralPackageManagement(errors = []) {
 /**
  * Audit 7: Portfolio Master Brief Parity
  */
-export function auditPortfolioMasterBrief(errors = [], { requireBrief = false } = {}) {
-  const briefCandidates = [
-    resolve(DEV_ROOT, 'KNOWTHANKYEW_PORTFOLIO_MASTER_BRIEF.md'),
-    resolve(REPO_ROOT, 'KNOWTHANKYEW_PORTFOLIO_MASTER_BRIEF.md'),
-  ];
+export function auditPortfolioMasterBrief(
+  errors = [],
+  { requireBrief = false, overrideBriefPath = null } = {}
+) {
+  const briefCandidates = overrideBriefPath
+    ? [overrideBriefPath]
+    : [
+        resolve(DEV_ROOT, 'KNOWTHANKYEW_PORTFOLIO_MASTER_BRIEF.md'),
+        resolve(REPO_ROOT, 'KNOWTHANKYEW_PORTFOLIO_MASTER_BRIEF.md'),
+      ];
   const briefPath = briefCandidates.find((p) => existsSync(p));
 
   if (!briefPath) {
