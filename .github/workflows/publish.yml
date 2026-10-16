@@ -24,7 +24,9 @@ jobs:
         run: npm install -g npm@latest
       - run: npm ci
       - run: npm --workspace=@knowthankyew/privacy-telemetry run build
-      - run: npm --workspace=@knowthankyew/privacy-telemetry publish --provenance --access public
+      - name: Stage @knowthankyew/privacy-telemetry on npm
+        working-directory: packages/privacy-telemetry
+        run: npm stage publish --provenance --access public
 
   publish-nuget:
     name: Publish KnowThankYew.Privacy.Telemetry (NuGet)
