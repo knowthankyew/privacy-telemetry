@@ -5,35 +5,38 @@ function r(e) {
 	function t(e, t) {
 		return e >>> t | e << 32 - t;
 	}
-	let n = Math.pow, r = n(2, 32), i, a, o = "", s = [], c = e.length * 8, l = [], u = [], d = 0, f = {};
-	for (let e = 2; d < 64; e++) if (!f[e]) {
-		for (i = 0; i < 313; i += e) f[i] = !0;
-		l[d] = n(e, .5) * r | 0, u[d++] = n(e, 1 / 3) * r | 0;
+	let n = Math.pow, r = n(2, 32), i, a, o = "", s = [], c = [], l = 0, u = {};
+	for (let e = 2; l < 64; e++) if (!u[e]) {
+		for (i = 0; i < 313; i += e) u[i] = !0;
+		s[l] = n(e, .5) * r | 0, c[l++] = n(e, 1 / 3) * r | 0;
 	}
-	let p = e + "";
-	for (; p.length % 64 - 56;) p += "\0";
-	for (i = 0; i < p.length; i++) a = p.charCodeAt(i), s[i >> 2] |= a << (3 - i) % 4 * 8;
-	for (s[s.length] = c / r | 0, s[s.length] = c, a = 0; a < s.length;) {
-		let e = s.slice(a, a += 16), n = l.slice(0);
+	let d = new TextEncoder().encode(e), f = d.length * 8, p = (d.length + 8 >> 6) + 1 << 6, m = new Uint8Array(p);
+	m.set(d), m[d.length] = 128;
+	let h = new DataView(m.buffer);
+	h.setUint32(p - 8, Math.floor(f / r), !1), h.setUint32(p - 4, f >>> 0, !1);
+	let g = p >> 2, _ = Array(g);
+	for (i = 0; i < g; i++) _[i] = h.getUint32(i * 4, !1);
+	for (a = 0; a < _.length;) {
+		let e = _.slice(a, a += 16), n = s.slice(0);
 		for (i = 0; i < 64; i++) {
 			let n = e[i - 15], r = e[i - 2], a = t(n, 7) ^ t(n, 18) ^ n >>> 3, o = t(r, 17) ^ t(r, 19) ^ r >>> 10;
 			e[i] = i < 16 ? e[i] : e[i - 16] + a + e[i - 7] + o | 0;
-			let s = t(l[4], 6) ^ t(l[4], 11) ^ t(l[4], 25), c = l[4] & l[5] ^ ~l[4] & l[6], d = l[7] + s + c + u[i] + e[i] | 0;
-			l = [
-				d + ((t(l[0], 2) ^ t(l[0], 13) ^ t(l[0], 22)) + (l[0] & l[1] ^ l[0] & l[2] ^ l[1] & l[2]) | 0) | 0,
-				l[0],
-				l[1],
-				l[2],
-				l[3] + d | 0,
-				l[4],
-				l[5],
-				l[6]
+			let l = t(s[4], 6) ^ t(s[4], 11) ^ t(s[4], 25), u = s[4] & s[5] ^ ~s[4] & s[6], d = s[7] + l + u + c[i] + e[i] | 0;
+			s = [
+				d + ((t(s[0], 2) ^ t(s[0], 13) ^ t(s[0], 22)) + (s[0] & s[1] ^ s[0] & s[2] ^ s[1] & s[2]) | 0) | 0,
+				s[0],
+				s[1],
+				s[2],
+				s[3] + d | 0,
+				s[4],
+				s[5],
+				s[6]
 			];
 		}
-		for (i = 0; i < 8; i++) l[i] = l[i] + n[i] | 0;
+		for (i = 0; i < 8; i++) s[i] = s[i] + n[i] | 0;
 	}
 	for (i = 0; i < 8; i++) for (a = 3; a >= 0; a--) {
-		let e = l[i] >> 8 * a & 255;
+		let e = s[i] >> 8 * a & 255;
 		o += (e < 16 ? "0" : "") + e.toString(16);
 	}
 	return `[TRUNCATED_HASH_${o.slice(0, 8)}]`;

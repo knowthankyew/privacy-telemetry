@@ -56,8 +56,6 @@ export function formatTruncatedDigest(value: string): string {
   const maxWord = mathPow(2, 32);
   let i: number, j: number;
   let result = '';
-  const words: number[] = [];
-  const asciiBitLength = value.length * 8;
   let hash: number[] = [];
   const k: number[] = [];
   let primeCounter = 0;
@@ -71,14 +69,22 @@ export function formatTruncatedDigest(value: string): string {
     }
   }
 
-  let ascii = value + '\x80';
-  while ((ascii.length % 64) - 56) ascii += '\x00';
-  for (i = 0; i < ascii.length; i++) {
-    j = ascii.charCodeAt(i);
-    words[i >> 2] |= j << (((3 - i) % 4) * 8);
+  const bytes = new TextEncoder().encode(value);
+  const bitLength = bytes.length * 8;
+  const paddedLength = (((bytes.length + 8) >> 6) + 1) << 6;
+  const padded = new Uint8Array(paddedLength);
+  padded.set(bytes);
+  padded[bytes.length] = 0x80;
+
+  const view = new DataView(padded.buffer);
+  view.setUint32(paddedLength - 8, Math.floor(bitLength / maxWord), false);
+  view.setUint32(paddedLength - 4, bitLength >>> 0, false);
+
+  const wordsCount = paddedLength >> 2;
+  const words: number[] = new Array(wordsCount);
+  for (i = 0; i < wordsCount; i++) {
+    words[i] = view.getUint32(i * 4, false);
   }
-  words[words.length] = (asciiBitLength / maxWord) | 0;
-  words[words.length] = asciiBitLength;
 
   for (j = 0; j < words.length; ) {
     const w = words.slice(j, (j += 16));

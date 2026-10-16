@@ -133,11 +133,11 @@ export function auditZeroEgress(errors = [], { overrideSrcDir = null, overrideAu
             errors.push(
               `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Forbidden network primitive: ${trimmed}`
             );
-          } else if (/\bfetch\s*\(/.test(line)) {
+          } else if (/(?:\bfetch\s*\(|(?:globalThis|window)\s*\[\s*['"`]fetch['"`]\s*\]\s*\()/.test(line)) {
             const isExempt = isAuthorizedExporter && inExportToOtlp;
             if (!isExempt) {
               errors.push(
-                `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Direct fetch() detected outside exportToOtlp in authorized exporter: ${trimmed}`
+                `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Direct or computed fetch() detected outside exportToOtlp in authorized exporter: ${trimmed}`
               );
             }
           }
@@ -150,7 +150,9 @@ export function auditZeroEgress(errors = [], { overrideSrcDir = null, overrideAu
 
   // Check TypeScript TelemetryManager defaults
   const managerPath = resolve(tsSrcDir, 'manager.ts');
-  if (existsSync(managerPath)) {
+  if (!existsSync(managerPath)) {
+    errors.push('Missing packages/privacy-telemetry/src/manager.ts');
+  } else {
     const mgrContent = readFileSync(managerPath, 'utf-8');
     if (!mgrContent.includes("defaultMode: TelemetryMode = envEndpoint ? 'otlp' : 'memory_only'")) {
       errors.push('TelemetryManager default mode must default to memory_only when no endpoint is configured.');
@@ -165,7 +167,11 @@ export function auditZeroEgress(errors = [], { overrideSrcDir = null, overrideAu
     REPO_ROOT,
     'packages/KnowThankYew.Privacy.Telemetry/Configuration/PrivacyTelemetryOptions.cs'
   );
-  if (existsSync(netOptionsPath)) {
+  if (!existsSync(netOptionsPath)) {
+    errors.push(
+      'Missing packages/KnowThankYew.Privacy.Telemetry/Configuration/PrivacyTelemetryOptions.cs'
+    );
+  } else {
     const optContent = readFileSync(netOptionsPath, 'utf-8');
     if (!optContent.includes('public bool BurnEnabled { get; set; } = true;')) {
       errors.push('PrivacyOptions.BurnEnabled must default to true.');

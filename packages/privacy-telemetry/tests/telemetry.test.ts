@@ -60,14 +60,18 @@ describe('@knowthankyew/privacy-telemetry Core Invariants', () => {
 
   it('Invariant 3: Truncates oversized string values even on allowlisted keys', () => {
     const oversizedString = 'A'.repeat(300);
+    const nonAsciiOversized = '🔒'.repeat(150);
     const span = telemetry.startSpan('audit.large_payload', {
       rule_id: oversizedString,
+      statute_code: nonAsciiOversized,
     });
     span.end('OK');
 
     const spans = telemetry.getBufferedSpans();
     expect(spans[0].attributes.rule_id).toBe('[TRUNCATED_HASH_4daeb9ac]');
     expect(spans[0].attributes.rule_id).not.toContain('AAAA');
+    expect(spans[0].attributes.statute_code).toBe('[TRUNCATED_HASH_87287bd9]');
+    expect(spans[0].attributes.statute_code).not.toContain('🔒');
   });
 
   it('Invariant 4: "Burn Local Data" purges buffer and enforces permanent tombstone', () => {
