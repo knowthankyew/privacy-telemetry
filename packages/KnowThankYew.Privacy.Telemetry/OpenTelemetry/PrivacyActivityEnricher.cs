@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
 using KnowThankYew.Privacy.Telemetry.Core;
 
 namespace KnowThankYew.Privacy.Telemetry.OpenTelemetry;
@@ -28,8 +30,9 @@ public static class PrivacyActivityEnricher
                     }
                     else if (tag.Key != null && tag.Value is string s && s.Length > 256)
                     {
-                        var hashPrefix = s.Length >= 8 ? s[..8] : s;
-                        activity.SetTag(tag.Key, $"[TRUNCATED_HASH_{hashPrefix}...]");
+                        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(s));
+                        var digest = Convert.ToHexString(hashBytes)[..8].ToLowerInvariant();
+                        activity.SetTag(tag.Key, $"[TRUNCATED_HASH_{digest}]");
                     }
                 }
             }

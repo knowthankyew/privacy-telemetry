@@ -64,6 +64,12 @@ describe('Handoff Schema Validation & Protocol Specification', () => {
     expect(validateHandoffPayload({ ...sampleValidPayload, summary: { critical: Infinity, warning: 0, info: 0 } })).toBe(false);
   });
 
+  it('rejects envelope with fractional summary counts', () => {
+    expect(validateHandoffPayload({ ...sampleValidPayload, summary: { critical: 1.5, warning: 0, info: 0 } })).toBe(false);
+    expect(validateHandoffPayload({ ...sampleValidPayload, summary: { critical: 0, warning: 2.2, info: 0 } })).toBe(false);
+    expect(validateHandoffPayload({ ...sampleValidPayload, summary: { critical: 0, warning: 0, info: 3.7 } })).toBe(false);
+  });
+
   it('rejects unrecognized destination tools', () => {
     expect(validateHandoffPayload({ ...sampleValidPayload, targetTool: 'unknown-tool' as any })).toBe(false);
   });

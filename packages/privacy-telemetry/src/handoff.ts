@@ -95,6 +95,9 @@ export function validateHandoffPayload(payload: unknown): payload is KtyHandoffP
     !Number.isFinite(p.summary.critical) ||
     !Number.isFinite(p.summary.warning) ||
     !Number.isFinite(p.summary.info) ||
+    !Number.isInteger(p.summary.critical) ||
+    !Number.isInteger(p.summary.warning) ||
+    !Number.isInteger(p.summary.info) ||
     p.summary.critical < 0 ||
     p.summary.warning < 0 ||
     p.summary.info < 0

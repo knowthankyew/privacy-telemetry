@@ -80,12 +80,16 @@ const EXPECTED_HANDOFF_TOOLS = [
 /**
  * Audit 1: Zero-Egress & Network Invariants
  */
-export function auditZeroEgress(errors = []) {
-  const tsSrcDir = resolve(REPO_ROOT, 'packages/privacy-telemetry/src');
+export function auditZeroEgress(errors = [], { overrideSrcDir = null, overrideAuthorizedExporterPath = null } = {}) {
+  const tsSrcDir = overrideSrcDir || resolve(REPO_ROOT, 'packages/privacy-telemetry/src');
   if (!existsSync(tsSrcDir)) {
     errors.push('Missing packages/privacy-telemetry/src directory');
     return;
   }
+
+  const authorizedExporterPath =
+    overrideAuthorizedExporterPath ||
+    resolve(REPO_ROOT, 'packages/privacy-telemetry/src/exporter.ts');
 
   function scanDir(dir) {
     const entries = readdirSync(dir, { withFileTypes: true });
@@ -94,9 +98,12 @@ export function auditZeroEgress(errors = []) {
       if (entry.isDirectory()) {
         scanDir(fullPath);
       } else if (/\.(ts|tsx)$/.test(entry.name)) {
-        const isExporter = entry.name === 'exporter.ts';
+        const isAuthorizedExporter = fullPath === authorizedExporterPath;
         const content = readFileSync(fullPath, 'utf-8');
         const lines = content.split('\n');
+        let inExportToOtlp = false;
+        let seenOpeningBrace = false;
+        let braceDepth = 0;
 
         lines.forEach((line, lineIdx) => {
           const trimmed = line.trim();
@@ -104,15 +111,35 @@ export function auditZeroEgress(errors = []) {
             return;
           }
 
-          // In exporter.ts, fetch() is allowed only for exportToOtlp
+          if (isAuthorizedExporter) {
+            if (/\b(?:export\s+)?(?:async\s+)?function\s+exportToOtlp\b/.test(line)) {
+              inExportToOtlp = true;
+              seenOpeningBrace = false;
+              braceDepth = 0;
+            }
+            if (inExportToOtlp) {
+              const openBraces = (line.match(/\{/g) || []).length;
+              const closeBraces = (line.match(/\}/g) || []).length;
+              if (openBraces > 0) seenOpeningBrace = true;
+              braceDepth += openBraces - closeBraces;
+              if (seenOpeningBrace && braceDepth <= 0) {
+                inExportToOtlp = false;
+              }
+            }
+          }
+
+          // In authorized exporter file, fetch() is allowed only within exportToOtlp
           if (/\b(XMLHttpRequest|navigator\.sendBeacon|new\s+WebSocket)\b/.test(line)) {
             errors.push(
               `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Forbidden network primitive: ${trimmed}`
             );
-          } else if (/\bfetch\s*\(/.test(line) && !isExporter) {
-            errors.push(
-              `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Direct fetch() detected outside exporter.ts: ${trimmed}`
-            );
+          } else if (/\bfetch\s*\(/.test(line)) {
+            const isExempt = isAuthorizedExporter && inExportToOtlp;
+            if (!isExempt) {
+              errors.push(
+                `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Direct fetch() detected outside exportToOtlp in authorized exporter: ${trimmed}`
+              );
+            }
           }
         });
       }
@@ -387,7 +414,10 @@ export function auditPortfolioMasterBrief(
     const files = readdirSync(tsTestsDir).filter((f) => f.endsWith('.test.ts') || f.endsWith('.test.js'));
     for (const f of files) {
       const code = readFileSync(resolve(tsTestsDir, f), 'utf-8');
-      const testMatches = code.match(/\b(?:it|test)(?:\.only|\.skip)?\s*\(/g) || [];
+      const cleanCode = code
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/\/\/.*/g, '');
+      const testMatches = cleanCode.match(/\b(?:it|test)(?:\.only|\.skip)?\s*\(/g) || [];
       actualTsCount += testMatches.length;
     }
   }
@@ -403,7 +433,10 @@ export function auditPortfolioMasterBrief(
         scanNetTests(fullPath);
       } else if (entry.name.endsWith('.cs')) {
         const code = readFileSync(fullPath, 'utf-8');
-        const factMatches = code.match(/\[(?:Fact|Theory)(?:\([^)]*\))?\]/g) || [];
+        const cleanCode = code
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+          .replace(/\/\/.*/g, '');
+        const factMatches = cleanCode.match(/\[(?:Fact|Theory)(?:\([^)]*\))?\]/g) || [];
         actualNetCount += factMatches.length;
       }
     }

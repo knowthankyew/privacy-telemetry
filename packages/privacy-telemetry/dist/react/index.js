@@ -1,4 +1,4 @@
-import { n as e, t } from "../chunks/handoff-DeFM_mGY.js";
+import { n as e, t } from "../chunks/handoff-u36nFV0R.js";
 import { useCallback as n, useEffect as r, useState as i } from "react";
 import { jsx as a, jsxs as o } from "react/jsx-runtime";
 //#region src/react/usePrivacyTelemetry.ts

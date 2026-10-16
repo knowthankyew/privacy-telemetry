@@ -1,4 +1,4 @@
-import { n as e, t } from "./chunks/handoff-DeFM_mGY.js";
+import { n as e, t } from "./chunks/handoff-u36nFV0R.js";
 //#region src/allowlist.ts
 var n = /* @__PURE__ */ new Set(/* @__PURE__ */ "rule_id.rule_ids.statute_code.jurisdiction.status.risk_level.duration_ms.duration_sec.clause_count.total_clauses.flagged_clauses.flagged_count.standard_count.watch_count.unenforceable_count.char_count.matched_violations.error_code.job_id.service.action.step.current_step.total_steps.progress_pct.loss.device.adapter_path.adapter_size_bytes.base_model.dataset_hash.dataset_relative_path.exchange.routing_key".split("."));
 function r(e) {
