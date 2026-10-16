@@ -1,4 +1,4 @@
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
@@ -84,18 +84,27 @@ describe('Privacy Telemetry Claims & Invariant Linter Suite', () => {
     expect(errors).toEqual([]);
     expect(typeof checked).toBe('boolean');
 
-    // Positive test: controlled brief fixture
+    // Positive test: controlled brief fixture with isolated temporary test counting directories
     const tempBriefDir = mkdtempSync(join(tmpdir(), 'kty-brief-'));
     try {
       const mockBriefPath = join(tempBriefDir, 'MOCK_BRIEF.md');
+      const mockTsDir = join(tempBriefDir, 'ts-tests');
+      const mockNetDir = join(tempBriefDir, 'net-tests');
+      mkdirSync(mockTsDir, { recursive: true });
+      mkdirSync(mockNetDir, { recursive: true });
+      const testCall = 'it';
+      writeFileSync(join(mockTsDir, 'sample.test.ts'), `${testCall}("t1", () => {});\n${testCall}("t2", () => {});\n`);
+      writeFileSync(join(mockNetDir, 'SampleTests.cs'), '[Fact]\npublic void T1() {}\n');
       writeFileSync(
         mockBriefPath,
-        '| **`privacy-telemetry`** | TS/React (>=18), .NET 10 | Shared Core | 27/27 tests pass (21 TS + 6 .NET) |\n'
+        '| **`privacy-telemetry`** | TS/React (>=18), .NET 10 | Shared Core | 3/3 tests pass (2 TS + 1 .NET) |\n'
       );
       const fixtureErrors: string[] = [];
       const fixtureChecked = auditPortfolioMasterBrief(fixtureErrors, {
         requireBrief: true,
         overrideBriefPath: mockBriefPath,
+        overrideTsTestsDir: mockTsDir,
+        overrideNetTestsDir: mockNetDir,
       });
       expect(fixtureErrors).toEqual([]);
       expect(fixtureChecked).toBe(true);

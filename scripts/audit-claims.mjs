@@ -400,7 +400,12 @@ export function auditCentralPackageManagement(errors = []) {
  */
 export function auditPortfolioMasterBrief(
   errors = [],
-  { requireBrief = false, overrideBriefPath = null } = {}
+  {
+    requireBrief = false,
+    overrideBriefPath = null,
+    overrideTsTestsDir = null,
+    overrideNetTestsDir = null,
+  } = {}
 ) {
   const briefCandidates = overrideBriefPath
     ? [overrideBriefPath]
@@ -433,7 +438,7 @@ export function auditPortfolioMasterBrief(
   const documentedNet = parseInt(match[4], 10);
 
   // Count actual TS tests
-  const tsTestsDir = resolve(REPO_ROOT, 'packages/privacy-telemetry/tests');
+  const tsTestsDir = overrideTsTestsDir || resolve(REPO_ROOT, 'packages/privacy-telemetry/tests');
   let actualTsCount = 0;
   if (existsSync(tsTestsDir)) {
     const files = readdirSync(tsTestsDir).filter((f) => f.endsWith('.test.ts') || f.endsWith('.test.js'));
@@ -448,7 +453,7 @@ export function auditPortfolioMasterBrief(
   }
 
   // Count actual .NET tests
-  const netTestsDir = resolve(REPO_ROOT, 'tests');
+  const netTestsDir = overrideNetTestsDir || resolve(REPO_ROOT, 'tests');
   let actualNetCount = 0;
   function scanNetTests(dir) {
     const entries = readdirSync(dir, { withFileTypes: true });
