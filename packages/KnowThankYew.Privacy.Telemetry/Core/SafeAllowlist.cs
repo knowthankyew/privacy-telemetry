@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
+
 namespace KnowThankYew.Privacy.Telemetry.Core;
 
 public sealed class SafeAllowlist
@@ -14,6 +17,17 @@ public sealed class SafeAllowlist
         "standard_count", "watch_count", "unenforceable_count", "char_count",
         "matched_violations", "error_code", "service", "action", "step"
     };
+
+    /// <summary>
+    /// Computes an 8-character lowercase hexadecimal SHA-256 digest marker for oversized attributes.
+    /// Does not expose any source text.
+    /// </summary>
+    public static string FormatTruncatedDigest(string value)
+    {
+        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
+        var digest = Convert.ToHexString(hashBytes)[..8].ToLowerInvariant();
+        return $"[TRUNCATED_HASH_{digest}]";
+    }
 
     public SafeAllowlist(IEnumerable<string>? additionalKeys = null)
     {
@@ -53,8 +67,7 @@ public sealed class SafeAllowlist
 
             if (kv.Value is string s && s.Length > 256 && !allowRawPayloads)
             {
-                var hashPrefix = s.Length >= 8 ? s[..8] : s;
-                sanitized[kv.Key] = $"[TRUNCATED_HASH_{hashPrefix}...]";
+                sanitized[kv.Key] = FormatTruncatedDigest(s);
             }
             else
             {

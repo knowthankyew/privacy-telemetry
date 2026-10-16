@@ -66,7 +66,8 @@ describe('@knowthankyew/privacy-telemetry Core Invariants', () => {
     span.end('OK');
 
     const spans = telemetry.getBufferedSpans();
-    expect(spans[0].attributes.rule_id).toBe('[TRUNCATED_HASH_AAAAAAAA...]');
+    expect(spans[0].attributes.rule_id).toBe('[TRUNCATED_HASH_4daeb9ac]');
+    expect(spans[0].attributes.rule_id).not.toContain('AAAA');
   });
 
   it('Invariant 4: "Burn Local Data" purges buffer and enforces permanent tombstone', () => {

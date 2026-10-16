@@ -403,7 +403,8 @@ export function auditPortfolioMasterBrief(
     return false;
   }
 
-  const documentedTotal = parseInt(match[1], 10);
+  const documentedPassing = parseInt(match[1], 10);
+  const documentedTotal = parseInt(match[2], 10);
   const documentedTs = parseInt(match[3], 10);
   const documentedNet = parseInt(match[4], 10);
 
@@ -448,12 +449,13 @@ export function auditPortfolioMasterBrief(
   const actualTotal = actualTsCount + actualNetCount;
 
   if (
+    documentedPassing !== documentedTotal ||
     documentedTotal !== actualTotal ||
     documentedTs !== actualTsCount ||
     documentedNet !== actualNetCount
   ) {
     errors.push(
-      `Portfolio Brief Drift: KNOWTHANKYEW_PORTFOLIO_MASTER_BRIEF.md documents ${documentedTotal}/${documentedTotal} tests (${documentedTs} TS + ${documentedNet} .NET), but actual test suite has ${actualTotal} tests (${actualTsCount} TS + ${actualNetCount} .NET).`
+      `Portfolio Brief Drift: KNOWTHANKYEW_PORTFOLIO_MASTER_BRIEF.md documents ${documentedPassing}/${documentedTotal} tests (${documentedTs} TS + ${documentedNet} .NET), but actual test suite has ${actualTotal} tests (${actualTsCount} TS + ${actualNetCount} .NET).`
     );
     return false;
   }

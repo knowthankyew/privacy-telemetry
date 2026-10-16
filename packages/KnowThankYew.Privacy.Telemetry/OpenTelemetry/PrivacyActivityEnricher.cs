@@ -30,9 +30,7 @@ public static class PrivacyActivityEnricher
                     }
                     else if (tag.Key != null && tag.Value is string s && s.Length > 256)
                     {
-                        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(s));
-                        var digest = Convert.ToHexString(hashBytes)[..8].ToLowerInvariant();
-                        activity.SetTag(tag.Key, $"[TRUNCATED_HASH_{digest}]");
+                        activity.SetTag(tag.Key, SafeAllowlist.FormatTruncatedDigest(s));
                     }
                 }
             }

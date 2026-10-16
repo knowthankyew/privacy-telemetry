@@ -50,13 +50,15 @@ describe('Privacy Telemetry Claims & Invariant Linter Suite', () => {
     const errors: string[] = [];
     const checked = auditPortfolioMasterBrief(errors, { requireBrief: false });
     expect(errors).toEqual([]);
+    expect(checked).toBe(true);
 
     // Negative test: brief required but missing
     const missingErrors: string[] = [];
-    auditPortfolioMasterBrief(missingErrors, {
+    const missingChecked = auditPortfolioMasterBrief(missingErrors, {
       requireBrief: true,
       overrideBriefPath: '/non-existent/path/BRIEF.md',
     });
+    expect(missingChecked).toBe(false);
     expect(missingErrors.length).toBeGreaterThan(0);
     expect(missingErrors[0]).toContain('not found but required via --require-brief');
   });

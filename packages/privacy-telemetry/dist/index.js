@@ -2,27 +2,64 @@ import { n as e, t } from "./chunks/handoff-u36nFV0R.js";
 //#region src/allowlist.ts
 var n = /* @__PURE__ */ new Set(/* @__PURE__ */ "rule_id.rule_ids.statute_code.jurisdiction.status.risk_level.duration_ms.duration_sec.clause_count.total_clauses.flagged_clauses.flagged_count.standard_count.watch_count.unenforceable_count.char_count.matched_violations.error_code.job_id.service.action.step.current_step.total_steps.progress_pct.loss.device.adapter_path.adapter_size_bytes.base_model.dataset_hash.dataset_relative_path.exchange.routing_key".split("."));
 function r(e) {
+	function t(e, t) {
+		return e >>> t | e << 32 - t;
+	}
+	let n = Math.pow, r = n(2, 32), i, a, o = "", s = [], c = e.length * 8, l = [], u = [], d = 0, f = {};
+	for (let e = 2; d < 64; e++) if (!f[e]) {
+		for (i = 0; i < 313; i += e) f[i] = !0;
+		l[d] = n(e, .5) * r | 0, u[d++] = n(e, 1 / 3) * r | 0;
+	}
+	let p = e + "";
+	for (; p.length % 64 - 56;) p += "\0";
+	for (i = 0; i < p.length; i++) a = p.charCodeAt(i), s[i >> 2] |= a << (3 - i) % 4 * 8;
+	for (s[s.length] = c / r | 0, s[s.length] = c, a = 0; a < s.length;) {
+		let e = s.slice(a, a += 16), n = l.slice(0);
+		for (i = 0; i < 64; i++) {
+			let n = e[i - 15], r = e[i - 2], a = t(n, 7) ^ t(n, 18) ^ n >>> 3, o = t(r, 17) ^ t(r, 19) ^ r >>> 10;
+			e[i] = i < 16 ? e[i] : e[i - 16] + a + e[i - 7] + o | 0;
+			let s = t(l[4], 6) ^ t(l[4], 11) ^ t(l[4], 25), c = l[4] & l[5] ^ ~l[4] & l[6], d = l[7] + s + c + u[i] + e[i] | 0;
+			l = [
+				d + ((t(l[0], 2) ^ t(l[0], 13) ^ t(l[0], 22)) + (l[0] & l[1] ^ l[0] & l[2] ^ l[1] & l[2]) | 0) | 0,
+				l[0],
+				l[1],
+				l[2],
+				l[3] + d | 0,
+				l[4],
+				l[5],
+				l[6]
+			];
+		}
+		for (i = 0; i < 8; i++) l[i] = l[i] + n[i] | 0;
+	}
+	for (i = 0; i < 8; i++) for (a = 3; a >= 0; a--) {
+		let e = l[i] >> 8 * a & 255;
+		o += (e < 16 ? "0" : "") + e.toString(16);
+	}
+	return `[TRUNCATED_HASH_${o.slice(0, 8)}]`;
+}
+function i(e) {
 	let t = new Set(n);
 	if (e) for (let n of e) t.add(n.toLowerCase());
 	return {
 		allowlist: t,
 		sanitize: (e, n = !1) => {
-			let r = {};
-			for (let [i, a] of Object.entries(e)) {
-				let e = i.toLowerCase();
+			let i = {};
+			for (let [a, o] of Object.entries(e)) {
+				let e = a.toLowerCase();
 				if (!t.has(e) && !n) {
-					r[i] = "[REDACTED_BY_DEFAULT_ALLOWLIST]";
+					i[a] = "[REDACTED_BY_DEFAULT_ALLOWLIST]";
 					continue;
 				}
-				typeof a == "string" ? r[i] = a.length > 256 && !n ? `[TRUNCATED_HASH_${a.slice(0, 8)}...]` : a : (typeof a == "number" || typeof a == "boolean") && (r[i] = a);
+				typeof o == "string" ? i[a] = o.length > 256 && !n ? r(o) : o : (typeof o == "number" || typeof o == "boolean") && (i[a] = o);
 			}
-			return r;
+			return i;
 		}
 	};
 }
 //#endregion
 //#region src/exporter.ts
-var i = class {
+var a = class {
 	spans = [];
 	maxCapacity;
 	constructor(e = 500) {
@@ -41,7 +78,7 @@ var i = class {
 		return this.spans.length;
 	}
 };
-async function a(e, t, n = "knowthankyew-app") {
+async function o(e, t, n = "knowthankyew-app") {
 	if (typeof fetch < "u") try {
 		await fetch(e, {
 			method: "POST",
@@ -69,7 +106,7 @@ async function a(e, t, n = "knowthankyew-app") {
 }
 //#endregion
 //#region src/claims.ts
-function o(e, t) {
+function s(e, t) {
 	return e.isLocalOnlyHonest ? {
 		isLocalOnlyHonest: !0,
 		isEnterpriseBuild: !1,
@@ -98,7 +135,7 @@ function o(e, t) {
 }
 //#endregion
 //#region src/manager.ts
-var s = class {
+var c = class {
 	config;
 	memoryExporter;
 	auditLog = [];
@@ -111,19 +148,19 @@ var s = class {
 			n = void 0;
 		} catch {}
 		n ||= (typeof globalThis < "u" ? globalThis : void 0)?.process?.env?.OTEL_EXPORTER_OTLP_ENDPOINT;
-		let a = n ? "otlp" : "memory_only";
+		let r = n ? "otlp" : "memory_only";
 		this.config = {
-			mode: a,
+			mode: r,
 			otlpEndpoint: n || null,
 			allowRawPayloads: !1,
 			burnEnabled: !0,
 			auditDurable: !1,
-			networkEgress: a === "otlp" ? "allow_otlp" : "deny",
+			networkEgress: r === "otlp" ? "allow_otlp" : "deny",
 			serviceName: "knowthankyew-app",
 			...e
 		};
-		let { allowlist: o, sanitize: s } = r(t);
-		this.allowlist = o, this.sanitizer = s, this.memoryExporter = new i();
+		let { allowlist: o, sanitize: s } = i(t);
+		this.allowlist = o, this.sanitizer = s, this.memoryExporter = new a();
 	}
 	getConfig() {
 		return this.config;
@@ -145,11 +182,11 @@ var s = class {
 		let n = `span_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`, r = Date.now(), i = this.sanitizeAttributes(t);
 		return {
 			spanId: n,
-			end: (t = "OK", o = {}) => {
+			end: (t = "OK", a = {}) => {
 				if (this.config.mode === "disabled" || this.isBurned) return;
 				let s = Date.now(), c = {
 					...i,
-					...this.sanitizeAttributes(o)
+					...this.sanitizeAttributes(a)
 				}, l = {
 					id: n,
 					name: e,
@@ -160,7 +197,7 @@ var s = class {
 					attributes: c,
 					events: []
 				};
-				this.memoryExporter.export(l), this.config.mode === "otlp" && this.config.otlpEndpoint && a(this.config.otlpEndpoint, l, this.config.serviceName);
+				this.memoryExporter.export(l), this.config.mode === "otlp" && this.config.otlpEndpoint && o(this.config.otlpEndpoint, l, this.config.serviceName);
 			}
 		};
 	}
@@ -207,7 +244,7 @@ var s = class {
 		};
 	}
 	getPrivacyClaims(e) {
-		return o(this.getPrivacyAuditReport(), e);
+		return s(this.getPrivacyAuditReport(), e);
 	}
 	burn() {
 		this.config.burnEnabled && (this.memoryExporter.clear(), this.auditLog = [], this.isBurned = !0);
@@ -220,4 +257,4 @@ var s = class {
 	}
 };
 //#endregion
-export { n as DEFAULT_SAFE_ALLOWLIST_KEYS, t as KTY_HANDOFF_SESSION_KEY, i as MemoryExporter, s as TelemetryManager, r as createAllowlistSanitizer, a as exportToOtlp, o as getPrivacyClaims, e as validateHandoffPayload };
+export { n as DEFAULT_SAFE_ALLOWLIST_KEYS, t as KTY_HANDOFF_SESSION_KEY, a as MemoryExporter, c as TelemetryManager, i as createAllowlistSanitizer, o as exportToOtlp, r as formatTruncatedDigest, s as getPrivacyClaims, e as validateHandoffPayload };

@@ -72,7 +72,7 @@ public sealed class PrivacyTelemetryServiceTests
 
         var spans = telemetry.GetBufferedSpans();
         Assert.Single(spans);
-        Assert.Equal("[TRUNCATED_HASH_XXXXXXXX...]", spans[0].Attributes["rule_id"]);
+        Assert.Equal("[TRUNCATED_HASH_bbd2c3dd]", spans[0].Attributes["rule_id"]);
     }
 
     [Fact]

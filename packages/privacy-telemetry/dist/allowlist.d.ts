@@ -7,6 +7,11 @@
  */
 export declare const DEFAULT_SAFE_ALLOWLIST_KEYS: ReadonlySet<string>;
 /**
+ * Computes an 8-character lowercase hexadecimal SHA-256 digest marker for oversized attributes.
+ * Does not expose any source text.
+ */
+export declare function formatTruncatedDigest(value: string): string;
+/**
  * Creates an allowlist attribute sanitizer combining default safe keys with domain-specific extensions.
  */
 export declare function createAllowlistSanitizer(additionalKeys?: Iterable<string>): {
