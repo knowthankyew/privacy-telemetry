@@ -39,7 +39,7 @@ describe('Privacy Telemetry Claims & Invariant Linter Suite', () => {
       });
 
       const fetchViolations = computedErrors.filter((e) =>
-        e.includes('computed fetch() detected outside exportToOtlp')
+        e.includes('fetch detected in non-exporter source')
       );
       expect(fetchViolations).toHaveLength(1);
       expect(fetchViolations[0]).toContain('leak.ts:2');

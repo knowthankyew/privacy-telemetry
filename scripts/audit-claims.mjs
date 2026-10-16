@@ -99,27 +99,33 @@ export function auditZeroEgress(errors = [], { overrideSrcDir = null, overrideAu
         scanDir(fullPath);
       } else if (/\.(ts|tsx)$/.test(entry.name)) {
         const isAuthorizedExporter = fullPath === authorizedExporterPath;
-        const content = readFileSync(fullPath, 'utf-8');
-        const lines = content.split('\n');
+        const rawContent = readFileSync(fullPath, 'utf-8');
+        // Strip block comments first to preserve line numbers without discarding inline code
+        const contentWithoutBlockComments = rawContent.replace(/\/\*[\s\S]*?\*\//g, (match) =>
+          '\n'.repeat((match.match(/\n/g) || []).length)
+        );
+        const lines = contentWithoutBlockComments.split('\n');
         let inExportToOtlp = false;
         let seenOpeningBrace = false;
         let braceDepth = 0;
 
         lines.forEach((line, lineIdx) => {
-          const trimmed = line.trim();
-          if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
+          // Strip line comments
+          const codeOnly = line.replace(/\/\/.*$/, '');
+          const trimmed = codeOnly.trim();
+          if (!trimmed || trimmed.startsWith('*')) {
             return;
           }
 
           if (isAuthorizedExporter) {
-            if (/\b(?:export\s+)?(?:async\s+)?function\s+exportToOtlp\b/.test(line)) {
+            if (/\b(?:export\s+)?(?:async\s+)?function\s+exportToOtlp\b/.test(trimmed)) {
               inExportToOtlp = true;
               seenOpeningBrace = false;
               braceDepth = 0;
             }
             if (inExportToOtlp) {
-              const openBraces = (line.match(/\{/g) || []).length;
-              const closeBraces = (line.match(/\}/g) || []).length;
+              const openBraces = (trimmed.match(/\{/g) || []).length;
+              const closeBraces = (trimmed.match(/\}/g) || []).length;
               if (openBraces > 0) seenOpeningBrace = true;
               braceDepth += openBraces - closeBraces;
               if (seenOpeningBrace && braceDepth <= 0) {
@@ -128,16 +134,26 @@ export function auditZeroEgress(errors = [], { overrideSrcDir = null, overrideAu
             }
           }
 
-          // In authorized exporter file, fetch() is allowed only within exportToOtlp
-          if (/\b(XMLHttpRequest|navigator\.sendBeacon|new\s+WebSocket)\b/.test(line)) {
+          // Forbidden network primitives:
+          // XMLHttpRequest, sendBeacon (property or bracket), WebSocket, EventSource, Image pixel beacon
+          const forbiddenNetworkRegex =
+            /\b(?:XMLHttpRequest|new\s+WebSocket|EventSource|new\s+Image)\b|navigator(?:\.sendBeacon|\s*\[\s*['"`]sendBeacon['"`]\s*\])/;
+          if (forbiddenNetworkRegex.test(trimmed)) {
             errors.push(
               `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Forbidden network primitive: ${trimmed}`
             );
-          } else if (/(?:\bfetch\s*\(|(?:globalThis|window)\s*\[\s*['"`]fetch['"`]\s*\]\s*\()/.test(line)) {
+          } else if (
+            /(?:\bfetch(?:\s*\(|\.(?:call|apply)\s*\()|(?:globalThis|window)\s*\[\s*['"`]fetch['"`]\s*\](?:\s*\(|\.(?:call|apply)\s*\()|(?:const|let|var)\s+\w+\s*=\s*(?:globalThis\.|window\.)?fetch\b)/.test(
+              trimmed
+            )
+          ) {
             const isExempt = isAuthorizedExporter && inExportToOtlp;
             if (!isExempt) {
+              const contextDesc = isAuthorizedExporter
+                ? 'outside exportToOtlp in exporter.ts'
+                : 'in non-exporter source';
               errors.push(
-                `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Direct or computed fetch() detected outside exportToOtlp in authorized exporter: ${trimmed}`
+                `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Direct, computed, or aliased fetch detected ${contextDesc}: ${trimmed}`
               );
             }
           }

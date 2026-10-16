@@ -1,7 +1,6 @@
 import { n as e, t } from "./chunks/handoff-u36nFV0R.js";
-//#region src/allowlist.ts
-var n = /* @__PURE__ */ new Set(/* @__PURE__ */ "rule_id.rule_ids.statute_code.jurisdiction.status.risk_level.duration_ms.duration_sec.clause_count.total_clauses.flagged_clauses.flagged_count.standard_count.watch_count.unenforceable_count.char_count.matched_violations.error_code.job_id.service.action.step.current_step.total_steps.progress_pct.loss.device.adapter_path.adapter_size_bytes.base_model.dataset_hash.dataset_relative_path.exchange.routing_key".split("."));
-function r(e) {
+//#region src/sha256.ts
+function n(e) {
 	function t(e, t) {
 		return e >>> t | e << 32 - t;
 	}
@@ -39,30 +38,36 @@ function r(e) {
 		let e = s[i] >> 8 * a & 255;
 		o += (e < 16 ? "0" : "") + e.toString(16);
 	}
-	return `[TRUNCATED_HASH_${o.slice(0, 8)}]`;
+	return o;
 }
+//#endregion
+//#region src/allowlist.ts
+var r = /* @__PURE__ */ new Set(/* @__PURE__ */ "rule_id.rule_ids.statute_code.jurisdiction.status.risk_level.duration_ms.duration_sec.clause_count.total_clauses.flagged_clauses.flagged_count.standard_count.watch_count.unenforceable_count.char_count.matched_violations.error_code.job_id.service.action.step.current_step.total_steps.progress_pct.loss.device.adapter_path.adapter_size_bytes.base_model.dataset_hash.dataset_relative_path.exchange.routing_key".split("."));
 function i(e) {
-	let t = new Set(n);
+	return `[TRUNCATED_HASH_${n(e).slice(0, 8)}]`;
+}
+function a(e) {
+	let t = new Set(r);
 	if (e) for (let n of e) t.add(n.toLowerCase());
 	return {
 		allowlist: t,
 		sanitize: (e, n = !1) => {
-			let i = {};
+			let r = {};
 			for (let [a, o] of Object.entries(e)) {
 				let e = a.toLowerCase();
 				if (!t.has(e) && !n) {
-					i[a] = "[REDACTED_BY_DEFAULT_ALLOWLIST]";
+					r[a] = "[REDACTED_BY_DEFAULT_ALLOWLIST]";
 					continue;
 				}
-				typeof o == "string" ? i[a] = o.length > 256 && !n ? r(o) : o : (typeof o == "number" || typeof o == "boolean") && (i[a] = o);
+				typeof o == "string" ? r[a] = o.length > 256 && !n ? i(o) : o : (typeof o == "number" || typeof o == "boolean") && (r[a] = o);
 			}
-			return i;
+			return r;
 		}
 	};
 }
 //#endregion
 //#region src/exporter.ts
-var a = class {
+var o = class {
 	spans = [];
 	maxCapacity;
 	constructor(e = 500) {
@@ -81,7 +86,7 @@ var a = class {
 		return this.spans.length;
 	}
 };
-async function o(e, t, n = "knowthankyew-app") {
+async function s(e, t, n = "knowthankyew-app") {
 	if (typeof fetch < "u") try {
 		await fetch(e, {
 			method: "POST",
@@ -109,7 +114,7 @@ async function o(e, t, n = "knowthankyew-app") {
 }
 //#endregion
 //#region src/claims.ts
-function s(e, t) {
+function c(e, t) {
 	return e.isLocalOnlyHonest ? {
 		isLocalOnlyHonest: !0,
 		isEnterpriseBuild: !1,
@@ -138,7 +143,7 @@ function s(e, t) {
 }
 //#endregion
 //#region src/manager.ts
-var c = class {
+var l = class {
 	config;
 	memoryExporter;
 	auditLog = [];
@@ -162,8 +167,8 @@ var c = class {
 			serviceName: "knowthankyew-app",
 			...e
 		};
-		let { allowlist: o, sanitize: s } = i(t);
-		this.allowlist = o, this.sanitizer = s, this.memoryExporter = new a();
+		let { allowlist: i, sanitize: s } = a(t);
+		this.allowlist = i, this.sanitizer = s, this.memoryExporter = new o();
 	}
 	getConfig() {
 		return this.config;
@@ -187,20 +192,20 @@ var c = class {
 			spanId: n,
 			end: (t = "OK", a = {}) => {
 				if (this.config.mode === "disabled" || this.isBurned) return;
-				let s = Date.now(), c = {
+				let o = Date.now(), c = {
 					...i,
 					...this.sanitizeAttributes(a)
 				}, l = {
 					id: n,
 					name: e,
 					startTime: r,
-					endTime: s,
-					durationMs: s - r,
+					endTime: o,
+					durationMs: o - r,
 					status: t,
 					attributes: c,
 					events: []
 				};
-				this.memoryExporter.export(l), this.config.mode === "otlp" && this.config.otlpEndpoint && o(this.config.otlpEndpoint, l, this.config.serviceName);
+				this.memoryExporter.export(l), this.config.mode === "otlp" && this.config.otlpEndpoint && s(this.config.otlpEndpoint, l, this.config.serviceName);
 			}
 		};
 	}
@@ -247,7 +252,7 @@ var c = class {
 		};
 	}
 	getPrivacyClaims(e) {
-		return s(this.getPrivacyAuditReport(), e);
+		return c(this.getPrivacyAuditReport(), e);
 	}
 	burn() {
 		this.config.burnEnabled && (this.memoryExporter.clear(), this.auditLog = [], this.isBurned = !0);
@@ -260,4 +265,4 @@ var c = class {
 	}
 };
 //#endregion
-export { n as DEFAULT_SAFE_ALLOWLIST_KEYS, t as KTY_HANDOFF_SESSION_KEY, a as MemoryExporter, c as TelemetryManager, i as createAllowlistSanitizer, o as exportToOtlp, r as formatTruncatedDigest, s as getPrivacyClaims, e as validateHandoffPayload };
+export { r as DEFAULT_SAFE_ALLOWLIST_KEYS, t as KTY_HANDOFF_SESSION_KEY, o as MemoryExporter, l as TelemetryManager, a as createAllowlistSanitizer, s as exportToOtlp, i as formatTruncatedDigest, c as getPrivacyClaims, n as sha256Hex, e as validateHandoffPayload };

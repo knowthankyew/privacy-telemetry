@@ -5,6 +5,7 @@ import {
   createAllowlistSanitizer,
   getPrivacyClaims,
   DEFAULT_SAFE_ALLOWLIST_KEYS,
+  sha256Hex,
 } from '../src/index.js';
 
 describe('@knowthankyew/privacy-telemetry Core Invariants', () => {
@@ -72,6 +73,14 @@ describe('@knowthankyew/privacy-telemetry Core Invariants', () => {
     expect(spans[0].attributes.rule_id).not.toContain('AAAA');
     expect(spans[0].attributes.statute_code).toBe('[TRUNCATED_HASH_87287bd9]');
     expect(spans[0].attributes.statute_code).not.toContain('🔒');
+
+    // Known-answer tests against NIST SHA-256 vectors
+    expect(sha256Hex('')).toBe('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
+    expect(sha256Hex('abc')).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
+    const nist56Bytes = 'abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq';
+    expect(sha256Hex(nist56Bytes)).toBe(
+      '248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1'
+    );
   });
 
   it('Invariant 4: "Burn Local Data" purges buffer and enforces permanent tombstone', () => {

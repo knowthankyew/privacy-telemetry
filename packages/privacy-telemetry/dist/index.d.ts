@@ -8,4 +8,5 @@ export * from './exporter.js';
 export * from './claims.js';
 export * from './manager.js';
 export * from './handoff.js';
+export * from './sha256.js';
 //# sourceMappingURL=index.d.ts.map
