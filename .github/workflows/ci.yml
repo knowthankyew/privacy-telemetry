@@ -27,11 +27,14 @@ jobs:
       - name: Audit Dependencies
         run: npm audit --audit-level=high
 
+      - name: Audit Claims & Architectural Invariants
+        run: npm run audit:claims
+
       - name: Run Vitest Suite
-        run: npm run test
+        run: npm --workspace=@knowthankyew/privacy-telemetry run test
 
       - name: Build TypeScript Package
-        run: npm run build
+        run: npm --workspace=@knowthankyew/privacy-telemetry run build
 
   validate-dotnet:
     name: Build & Test .NET NuGet Package

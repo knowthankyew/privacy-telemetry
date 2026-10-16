@@ -34,8 +34,11 @@ export const DEFAULT_SAFE_ALLOWLIST_KEYS: ReadonlySet<string> = new Set([
   'progress_pct',
   'loss',
   'device',
+  'adapter_path',
   'adapter_size_bytes',
+  'base_model',
   'dataset_hash',
+  'dataset_relative_path',
   'exchange',
   'routing_key',
 ]);

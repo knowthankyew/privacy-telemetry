@@ -91,7 +91,13 @@ export function validateHandoffPayload(payload: unknown): payload is KtyHandoffP
   if (
     typeof p.summary.critical !== 'number' ||
     typeof p.summary.warning !== 'number' ||
-    typeof p.summary.info !== 'number'
+    typeof p.summary.info !== 'number' ||
+    !Number.isFinite(p.summary.critical) ||
+    !Number.isFinite(p.summary.warning) ||
+    !Number.isFinite(p.summary.info) ||
+    p.summary.critical < 0 ||
+    p.summary.warning < 0 ||
+    p.summary.info < 0
   ) {
     return false;
   }

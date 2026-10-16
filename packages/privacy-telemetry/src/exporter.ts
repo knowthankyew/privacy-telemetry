@@ -69,7 +69,9 @@ export async function exportToOtlp(
                         typeof val === 'string'
                           ? { stringValue: val }
                           : typeof val === 'number'
-                          ? { intValue: val }
+                          ? Number.isInteger(val)
+                            ? { intValue: val }
+                            : { doubleValue: val }
                           : { boolValue: val },
                     })),
                     status: {

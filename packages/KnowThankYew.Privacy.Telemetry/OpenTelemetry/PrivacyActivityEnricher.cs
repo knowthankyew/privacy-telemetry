@@ -26,6 +26,11 @@ public static class PrivacyActivityEnricher
                     {
                         activity.SetTag(tag.Key, "[REDACTED_NOT_IN_ALLOWLIST]");
                     }
+                    else if (tag.Key != null && tag.Value is string s && s.Length > 256)
+                    {
+                        var hashPrefix = s.Length >= 8 ? s[..8] : s;
+                        activity.SetTag(tag.Key, $"[TRUNCATED_HASH_{hashPrefix}...]");
+                    }
                 }
             }
         };

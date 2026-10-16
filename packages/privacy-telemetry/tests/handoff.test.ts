@@ -58,6 +58,12 @@ describe('Handoff Schema Validation & Protocol Specification', () => {
     expect(validateHandoffPayload({ ...sampleValidPayload, riskScore: 101 })).toBe(false);
   });
 
+  it('rejects envelope with negative, non-numeric, or NaN summary counts', () => {
+    expect(validateHandoffPayload({ ...sampleValidPayload, summary: { critical: -1, warning: 0, info: 0 } })).toBe(false);
+    expect(validateHandoffPayload({ ...sampleValidPayload, summary: { critical: NaN, warning: 0, info: 0 } })).toBe(false);
+    expect(validateHandoffPayload({ ...sampleValidPayload, summary: { critical: Infinity, warning: 0, info: 0 } })).toBe(false);
+  });
+
   it('rejects unrecognized destination tools', () => {
     expect(validateHandoffPayload({ ...sampleValidPayload, targetTool: 'unknown-tool' as any })).toBe(false);
   });

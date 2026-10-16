@@ -1,0 +1,87 @@
+# CodeRabbit Configuration for KnowThankYew Privacy Telemetry
+# Targeted Audit Scope: In-Memory Burnable Telemetry, Zero-Egress Core Invariants, Fail-Closed Allowlist Sanitization & Supply Chain Assurance
+
+language: "en-US"
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  sequence_diagrams: true
+  auto_review:
+    enabled: true
+    drafts: false
+
+  # Filter out compiled binaries, distribution builds, and lockfiles
+  path_filters:
+    - "!**/*.gif"
+    - "!**/*.mp4"
+    - "!**/*.png"
+    - "!packages/privacy-telemetry/dist/**"
+    - "!**/bin/**"
+    - "!**/obj/**"
+    - "!artifacts/**"
+    - "!package-lock.json"
+    - "!bom.json"
+    - "!bom.json.bundle"
+
+  path_instructions:
+    - path: "**/*"
+      instructions: |
+        You are performing an exhaustive architectural, security, and data privacy audit for "privacy-telemetry", the shared foundational core library consumed across the entire KnowThankYew application portfolio.
+        The repository is a dual-ecosystem monorepo housing `@knowthankyew/privacy-telemetry` (TypeScript/React npm package) and `KnowThankYew.Privacy.Telemetry` (.NET 10 NuGet package).
+
+        Evaluate all code against these non-negotiable architectural invariants:
+
+        1. VOLATILE MEMORY-ONLY DEFAULT & ZERO NETWORK EGRESS (CRITICAL):
+           - In default mode, all spans, metrics, and audit log records must be retained strictly in volatile in-memory circular buffers (`MemoryExporter` in TypeScript, `ConcurrentQueue` in .NET).
+           - Consumer default configuration must enforce zero network egress (`networkEgress: 'deny'`, `otlpEndpoint: null`). Outbound network egress must be strictly forbidden in consumer builds.
+           - Dead-code eliminable OTLP export (`exportToOtlp`) must only activate when an explicit OTLP endpoint is provided (`mode === 'otlp'`). All other modules must remain completely free of outbound network primitives (`fetch`, `XMLHttpRequest`, `sendBeacon`, `WebSocket`).
+
+        2. STRICT ALLOWLIST ATTRIBUTE SANITIZATION (CRITICAL):
+           - Telemetry attribute sanitizers (`createAllowlistSanitizer` in TS, `SafeAllowlist` in C#) must operate strictly on an allowlist, not a denylist.
+           - All unrecognized or arbitrary keys must be fail-closed redacted (`[REDACTED_BY_DEFAULT_ALLOWLIST]` or `[REDACTED_NOT_IN_ALLOWLIST]`). Under no circumstance may arbitrary payload text, raw document text, tenant names, SSNs, PHI, wage amounts, or matched snippet excerpts slip into telemetry unredacted unless `allowRawPayloads` is explicitly enabled.
+           - Length safety backstops must truncate oversized strings to prevent memory bloat or log injection attacks.
+
+        3. AMNESIAC HARD BURN TOMBSTONE:
+           - Invoking `burn()` must atomically wipe memory buffers, clear audit logs, and set a permanent runtime tombstone (`isBurned = true`).
+           - Once burned, all subsequent span recording and audit event calls must be discarded immediately without recreating buffers.
+
+        4. SINGLE SOURCE OF TRUTH FOR DYNAMIC PRIVACY CLAIMS:
+           - User-facing UI claims, badges, dropzone text, and footers must be derived dynamically from active runtime telemetry state via `getPrivacyClaims()` in TS and `PrivacyAuditReport` in .NET.
+           - When an external OTLP exporter is active, claims stating "100% Client-Side Local Execution" or "Zero Network" must be strictly suppressed, replacing them with clear operational metadata export indicators.
+
+        5. CROSS-ENGINE STRUCTURED HANDOFF PROTOCOL:
+           - `validateHandoffPayload()` must enforce fail-closed runtime schema validation for cross-tool findings passed from the browser extension (`knowthankyew-extension`) into destination tools (`bill-of-rights-bot`, `lease-audit`, `care-check`, `warranty-watch`, `paystub-check`).
+           - Validate category, severity, risk score, and required metadata fields.
+
+        6. SUPPLY CHAIN ASSURANCE & CENTRAL PACKAGE MANAGEMENT (CPM):
+           - .NET 10 projects must centrally manage package versions in `Directory.Packages.props` (`<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>`).
+           - `Directory.Build.props` must enforce fail-closed NuGet security auditing (`<WarningsAsErrors>$(WarningsAsErrors);NU1903;NU1904</WarningsAsErrors>`).
+           - Builds must produce CycloneDX SBOMs signed with Sigstore / Cosign keyless attestation.
+
+    - path: "packages/privacy-telemetry/**"
+      instructions: "Audit TypeScript runtime: circular buffer capacity enforcement, fail-closed allowlist sanitization, React context, hooks (`usePrivacyTelemetry`, `useKTYHandoff`), and headless modal (`PrivacyAuditModal`)."
+
+    - path: "packages/KnowThankYew.Privacy.Telemetry/**"
+      instructions: "Audit .NET 10 package: thread-safe `ConcurrentQueue` buffer, `ActivitySource` tag sanitization, fail-closed `SafeAllowlist`, and ASP.NET Core DI extensions."
+
+    - path: "tests/**"
+      instructions: "Audit .NET unit tests for memory bounds, allowlist redaction negative controls, amnesiac burn tombstones, and configuration mapping."
+
+    - path: "packages/privacy-telemetry/tests/**"
+      instructions: "Audit Vitest suites for zero network leaks, circular buffer eviction, allowlist redaction, honest claims switching, and handoff schema validation."
+
+    - path: "scripts/**"
+      instructions: "Audit claims and architectural invariant linting scripts for static analysis correctness and Portfolio Master Brief parity."
+
+knowledge_base:
+  opt_out: false
+  learnings:
+    scope: "auto"
+  linked_repositories:
+    - repository: "knowthankyew/portfolio-admin"
+      instructions: "Contains portfolio integration standards, Master Brief assertions, and cross-repository audit specifications."
+    - repository: "knowthankyew/knowthankyew-extension"
+      instructions: "Flagship consumer browser extension utilizing structured handoff and dynamic privacy claims."
