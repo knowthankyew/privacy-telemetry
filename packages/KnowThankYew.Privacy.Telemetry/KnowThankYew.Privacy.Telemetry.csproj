@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <PackageId>KnowThankYew.Privacy.Telemetry</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>knowthankyew Contributors</Authors>
     <Description>Zero-fork, consumer-safe in-memory privacy telemetry engine and OpenTelemetry enricher for KnowThankYew .NET applications.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

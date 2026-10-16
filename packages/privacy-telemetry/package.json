@@ -1,6 +1,6 @@
 {
   "name": "@knowthankyew/privacy-telemetry",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "OpenTelemetry-compatible burnable in-memory privacy telemetry runtime for client-side applications.",
   "type": "module",
   "main": "./dist/index.js",
