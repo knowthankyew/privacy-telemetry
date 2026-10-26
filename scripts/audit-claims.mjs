@@ -27,6 +27,25 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  stripLineComment,
+  stripBlockComments,
+  FORBIDDEN_NETWORK_REGEX,
+  testNetworkPrimitive,
+  scanSourceForNetworkPrimitives,
+  scanDocumentationForVocabulary,
+  BANNED_VOCABULARY,
+} from './claims-linter-core.mjs';
+
+export {
+  stripLineComment,
+  stripBlockComments,
+  FORBIDDEN_NETWORK_REGEX,
+  testNetworkPrimitive,
+  scanSourceForNetworkPrimitives,
+  scanDocumentationForVocabulary,
+  BANNED_VOCABULARY,
+};
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -114,7 +133,7 @@ export function auditZeroEgress(errors = [], { overrideSrcDir = null, overrideAu
 
         lines.forEach((line, lineIdx) => {
           // Strip line comments
-          const codeOnly = line.replace(/\/\/.*$/, '');
+          const codeOnly = stripLineComment(line);
           const trimmed = codeOnly.trim();
           if (!trimmed || trimmed.startsWith('*')) {
             return;
