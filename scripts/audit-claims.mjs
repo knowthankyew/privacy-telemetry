@@ -102,7 +102,37 @@ const EXPECTED_HANDOFF_TOOLS = [
 /**
  * Audit 1: Zero-Egress & Network Invariants
  */
-export function auditZeroEgress(errors = [], { overrideSrcDir = null, overrideAuthorizedExporterPath = null } = {}) {
+const FETCH_PRIMITIVE_REGEX =
+  /(?:\b(?:fetch|\??\.\s*fetch)\s*\(|=\s*fetch\b|\[\s*['"`]fetch['"`]\s*\]|\b(?:window|globalThis|self)\s*(?:\.\s*fetch|\[\s*['"`]fetch['"`]\s*\]))/;
+
+const NON_FETCH_NETWORK_REGEX =
+  /(?:\b(?:XMLHttpRequest|axios)\b|\[\s*['"`](?:XMLHttpRequest|sendBeacon|WebSocket|EventSource|axios)['"`]\s*\]|\bnavigator\s*(?:\??\.\s*sendBeacon|\[\s*['"`]sendBeacon['"`]\s*\])|\bnew\s+(?:WebSocket|EventSource|Image)\b|\bnew\s+Worker\s*\(\s*(?:new\s+URL\s*\(\s*)?['"`]https?:\/\/|\bimport\s*\(\s*['"`]https?:\/\/|\bdocument\s*(?:\??\.\s*createElement|\[\s*['"`]createElement['"`]\s*\])\s*\(\s*['"`]script['"`]\s*\))/;
+
+export function auditZeroEgress(
+  errors = [],
+  {
+    overrideSrcDir = null,
+    overrideAuthorizedExporterPath = null,
+    overrideCodeSnippets = null,
+  } = {}
+) {
+  if (overrideCodeSnippets && Array.isArray(overrideCodeSnippets)) {
+    for (const [idx, snippet] of overrideCodeSnippets.entries()) {
+      const codeOnly = stripLineComment(snippet);
+      const trimmed = codeOnly.trim();
+      if (!trimmed || trimmed.startsWith('*')) continue;
+      if (testNetworkPrimitive(trimmed)) {
+        if (NON_FETCH_NETWORK_REGEX.test(trimmed)) {
+          errors.push(`Privacy violation in snippet:${idx + 1}: Forbidden network primitive: ${trimmed}`);
+        } else if (FETCH_PRIMITIVE_REGEX.test(trimmed)) {
+          errors.push(`Privacy violation in snippet:${idx + 1}: Direct, computed, or aliased fetch detected in non-exporter source: ${trimmed}`);
+        } else {
+          errors.push(`Privacy violation in snippet:${idx + 1}: Forbidden network primitive: ${trimmed}`);
+        }
+      }
+    }
+  }
+
   const tsSrcDir = overrideSrcDir || resolve(REPO_ROOT, 'packages/privacy-telemetry/src');
   if (!existsSync(tsSrcDir)) {
     errors.push('Missing packages/privacy-telemetry/src directory');
@@ -156,26 +186,27 @@ export function auditZeroEgress(errors = [], { overrideSrcDir = null, overrideAu
             }
           }
 
-          // Forbidden network primitives:
-          // XMLHttpRequest, sendBeacon (property or bracket), WebSocket, EventSource, Image pixel beacon
-          const forbiddenNetworkRegex =
-            /\b(?:XMLHttpRequest|new\s+WebSocket|EventSource|new\s+Image)\b|navigator(?:\.sendBeacon|\s*\[\s*['"`]sendBeacon['"`]\s*\])/;
-          if (forbiddenNetworkRegex.test(trimmed)) {
-            errors.push(
-              `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Forbidden network primitive: ${trimmed}`
-            );
-          } else if (
-            /(?:\bfetch(?:\s*\(|\.(?:call|apply)\s*\()|(?:globalThis|window)\s*\[\s*['"`]fetch['"`]\s*\](?:\s*\(|\.(?:call|apply)\s*\()|(?:const|let|var)\s+\w+\s*=\s*(?:globalThis\.|window\.)?fetch\b)/.test(
-              trimmed
-            )
-          ) {
-            const isExempt = isAuthorizedExporter && inExportToOtlp;
-            if (!isExempt) {
-              const contextDesc = isAuthorizedExporter
-                ? 'outside exportToOtlp in exporter.ts'
-                : 'in non-exporter source';
+          // Forbidden network primitives verified via shared core regex:
+          if (testNetworkPrimitive(trimmed)) {
+            // Check if this line matches forbidden non-fetch network primitives
+            // (Workers, dynamic scripts, WebSockets, sendBeacon, Image beacon, import)
+            if (NON_FETCH_NETWORK_REGEX.test(trimmed)) {
               errors.push(
-                `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Direct, computed, or aliased fetch detected ${contextDesc}: ${trimmed}`
+                `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Forbidden network primitive: ${trimmed}`
+              );
+            } else if (FETCH_PRIMITIVE_REGEX.test(trimmed)) {
+              const isExempt = isAuthorizedExporter && inExportToOtlp;
+              if (!isExempt) {
+                const contextDesc = isAuthorizedExporter
+                  ? 'outside exportToOtlp in exporter.ts'
+                  : 'in non-exporter source';
+                errors.push(
+                  `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Direct, computed, or aliased fetch detected ${contextDesc}: ${trimmed}`
+                );
+              }
+            } else {
+              errors.push(
+                `Privacy violation in ${fullPath.replace(REPO_ROOT + '/', '')}:${lineIdx + 1}: Forbidden network primitive: ${trimmed}`
               );
             }
           }

