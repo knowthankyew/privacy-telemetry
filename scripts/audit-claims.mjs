@@ -331,6 +331,7 @@ export function auditVocabulary(errors = []) {
     resolve(REPO_ROOT, 'README.md'),
     resolve(REPO_ROOT, 'NOTICE.md'),
     resolve(REPO_ROOT, 'PRIVACY_TELEMETRY_SCHEMA.md'),
+    resolve(REPO_ROOT, 'docs/ARCHITECTURE.md'),
   ];
 
   for (const docPath of docsToCheck) {
