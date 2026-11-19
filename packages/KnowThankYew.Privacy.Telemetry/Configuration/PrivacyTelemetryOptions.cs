@@ -14,8 +14,20 @@ public sealed class PrivacyTelemetryOptions
 
 public sealed class PrivacyOptions
 {
+    private string _networkEgress = "deny";
+    internal bool HasExplicitNetworkEgress { get; private set; }
+
     public bool BurnEnabled { get; set; } = true;
-    public string NetworkEgress { get; set; } = "deny";
+
+    public string NetworkEgress
+    {
+        get => _networkEgress;
+        set
+        {
+            _networkEgress = string.IsNullOrWhiteSpace(value) ? "deny" : value;
+            HasExplicitNetworkEgress = true;
+        }
+    }
 }
 
 public sealed class TelemetryOptions

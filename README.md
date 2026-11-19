@@ -30,9 +30,9 @@ TypeScript & React package for client-side web applications.
 .NET 10 class library for backend services.
 - `IPrivacyTelemetry` interface & `PrivacyTelemetryService`
 - Thread-safe in-memory buffer (`ConcurrentQueue`) with burn routine
-- Native BCL `ActivitySource` & `Activity` tag sanitization
+- Native BCL `ActivitySource` & `Activity` tag sanitization (`PrivacyActivityEnricher.SanitizeActivity`, `TrySanitizeActivity` for exception-safe `OnEnd`/processor export gating, `AddSanitizedEvent`, and `CreateExporterSafeStopCallback` for export-boundary enforcement when OpenTelemetry exporters are registered)
 - Configuration models adhering to [PRIVACY_TELEMETRY_SCHEMA.md](./PRIVACY_TELEMETRY_SCHEMA.md)
-- ASP.NET Core dependency injection (`AddPrivacyTelemetry`) & endpoint mapping (`MapPrivacyTelemetryEndpoints`)
+- ASP.NET Core dependency injection (`AddPrivacyTelemetry`, registering `IPrivacyTelemetry` without registering an OpenTelemetry SDK exporter), optional process-wide outbound propagator installation (`UsePrivacySafePropagator` / `PrivacyActivityEnricher.InstallSanitizingPropagator`, which replaces the process-global `DistributedContextPropagator.Current` bound to the singleton service and allowlist when explicitly opted in), & endpoint mapping (`MapPrivacyTelemetryEndpoints`)
 
 ---
 

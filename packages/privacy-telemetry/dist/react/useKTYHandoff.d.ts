@@ -9,7 +9,7 @@ export interface UseKTYHandoffResult {
  *
  * Reads from sessionStorage['kty_handoff'] on mount.
  * Automatically clears payload state upon receiving Nuclear Hard Burn broadcast
- * via BroadcastChannel('kty_hard_burn') or postMessage.
+ * via BroadcastChannel('kty_hard_burn'), postMessage, or TelemetryManager.burn().
  */
 export declare function useKTYHandoff(expectedTargetTool?: string): UseKTYHandoffResult;
 //# sourceMappingURL=useKTYHandoff.d.ts.map
