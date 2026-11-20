@@ -38,6 +38,25 @@ export interface KtyHandoffPayload {
     targetTool: DestinationToolId;
 }
 export declare const KTY_HANDOFF_SESSION_KEY = "kty_handoff";
+export declare const KTY_HANDOFF_HASH_PARAM = "kty_handoff";
+/**
+ * Encodes a validated KTY handoff payload into a URL-safe base64url token
+ * for zero-egress URL fragment delivery (#kty_handoff=...).
+ */
+export declare function encodeHandoffFragmentValue(payload: KtyHandoffPayload): string | null;
+/**
+ * Decodes and validates a base64url-encoded KTY handoff fragment token.
+ * Fails closed on malformed encoding, JSON syntax errors, or schema violations.
+ */
+export declare function decodeHandoffFragmentValue(encoded: string): KtyHandoffPayload | null;
+/**
+ * Extracts and validates a KTY handoff payload from a URL hash string (e.g. #kty_handoff=...).
+ */
+export declare function extractHandoffFromHash(hash: string, expectedTargetTool?: string): {
+    payload: KtyHandoffPayload | null;
+    hasHandoffParam: boolean;
+    remainingHash: string;
+};
 /**
  * Fail-closed runtime validator for incoming KtyHandoffPayload envelopes.
  */

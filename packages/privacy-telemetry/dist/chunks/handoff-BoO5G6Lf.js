@@ -1895,29 +1895,108 @@ var Mt = class e {
 	restartSession() {
 		this.reset();
 	}
-}, Nt = "kty_handoff", Pt = /* @__PURE__ */ new Set([
+}, Nt = "kty_handoff", Pt = "kty_handoff";
+function Ft(e) {
+	let t = "";
+	for (let n = 0; n < e.length; n++) t += String.fromCharCode(e[n]);
+	return btoa(t).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function It(e) {
+	if (!e || !/^[A-Za-z0-9_-]+$/.test(e)) return null;
+	let t = e.replace(/-/g, "+").replace(/_/g, "/"), n = (4 - t.length % 4) % 4, r = t + "=".repeat(n);
+	try {
+		let e = atob(r), t = new Uint8Array(e.length);
+		for (let n = 0; n < e.length; n++) t[n] = e.charCodeAt(n);
+		return t;
+	} catch {
+		return null;
+	}
+}
+function Lt(e) {
+	if (!Ut(e)) return null;
+	try {
+		let t = JSON.stringify(e);
+		return Ft(new TextEncoder().encode(t));
+	} catch {
+		return null;
+	}
+}
+function Rt(e) {
+	let t = It(e);
+	if (!t) return null;
+	try {
+		let e = new TextDecoder("utf-8", { fatal: !0 }).decode(t), n = JSON.parse(e);
+		return Ut(n) ? n : null;
+	} catch {
+		return null;
+	}
+}
+function zt(e, t) {
+	if (typeof e != "string" || e.length === 0) return {
+		payload: null,
+		hasHandoffParam: !1,
+		remainingHash: ""
+	};
+	let n = e.startsWith("#") ? e.slice(1) : e;
+	if (!n) return {
+		payload: null,
+		hasHandoffParam: !1,
+		remainingHash: ""
+	};
+	let r = n.split("&").filter(Boolean), i = null, a = [];
+	for (let e of r) {
+		let t = e.indexOf("=");
+		if ((t === -1 ? e : e.slice(0, t)) === "kty_handoff") {
+			i === null && t !== -1 && (i = e.slice(t + 1));
+			continue;
+		}
+		a.push(e);
+	}
+	if (!n.split("&").some((e) => e === "kty_handoff" || e.startsWith("kty_handoff="))) return {
+		payload: null,
+		hasHandoffParam: !1,
+		remainingHash: e
+	};
+	let o = a.length > 0 ? `#${a.join("&")}` : "";
+	if (!i) return {
+		payload: null,
+		hasHandoffParam: !0,
+		remainingHash: o
+	};
+	let s = Rt(i);
+	return !s || t && s.targetTool !== t ? {
+		payload: null,
+		hasHandoffParam: !0,
+		remainingHash: o
+	} : {
+		payload: s,
+		hasHandoffParam: !0,
+		remainingHash: o
+	};
+}
+var Bt = /* @__PURE__ */ new Set([
 	"AUTO_RENEWAL",
 	"ARBITRATION",
 	"UNILATERAL_CHANGE",
 	"SURVEILLANCE",
 	"WARRANTY_DISCLAIMER"
-]), Ft = /* @__PURE__ */ new Set([
+]), Vt = /* @__PURE__ */ new Set([
 	"CRITICAL",
 	"WARNING",
 	"INFO"
-]), It = /* @__PURE__ */ new Set([
+]), Ht = /* @__PURE__ */ new Set([
 	"bill-of-rights-bot",
 	"lease-audit",
 	"care-check",
 	"warranty-watch",
 	"paystub-check"
 ]);
-function Lt(e) {
+function Ut(e) {
 	if (!e || typeof e != "object") return !1;
 	let t = e;
 	if (t.version !== "1.0" || t.originApp !== "knowthankyew-extension" || typeof t.domain != "string" || t.domain.trim().length === 0 || typeof t.scanTimestamp != "string" || Number.isNaN(Date.parse(t.scanTimestamp)) || typeof t.riskScore != "number" || t.riskScore < 0 || t.riskScore > 100 || !t.summary || typeof t.summary != "object" || typeof t.summary.critical != "number" || typeof t.summary.warning != "number" || typeof t.summary.info != "number" || !Number.isFinite(t.summary.critical) || !Number.isFinite(t.summary.warning) || !Number.isFinite(t.summary.info) || !Number.isInteger(t.summary.critical) || !Number.isInteger(t.summary.warning) || !Number.isInteger(t.summary.info) || t.summary.critical < 0 || t.summary.warning < 0 || t.summary.info < 0 || !Array.isArray(t.findings)) return !1;
-	for (let e of t.findings) if (!e || typeof e != "object" || typeof e.ruleId != "string" || e.ruleId.trim().length === 0 || typeof e.title != "string" || e.title.trim().length === 0 || !Pt.has(e.category) || !Ft.has(e.severity) || typeof e.statuteCode != "string" || typeof e.statuteTitle != "string" || typeof e.matchedSnippet != "string" || typeof e.explanation != "string" || typeof e.recommendation != "string") return !1;
-	return !(typeof t.targetTool != "string" || !It.has(t.targetTool) || t.primaryLegalLink !== null && (!t.primaryLegalLink || typeof t.primaryLegalLink != "object" || typeof t.primaryLegalLink.url != "string" || typeof t.primaryLegalLink.title != "string"));
+	for (let e of t.findings) if (!e || typeof e != "object" || typeof e.ruleId != "string" || e.ruleId.trim().length === 0 || typeof e.title != "string" || e.title.trim().length === 0 || !Bt.has(e.category) || !Vt.has(e.severity) || typeof e.statuteCode != "string" || typeof e.statuteTitle != "string" || typeof e.matchedSnippet != "string" || typeof e.explanation != "string" || typeof e.recommendation != "string") return !1;
+	return !(typeof t.targetTool != "string" || !Ht.has(t.targetTool) || t.primaryLegalLink !== null && (!t.primaryLegalLink || typeof t.primaryLegalLink != "object" || typeof t.primaryLegalLink.url != "string" || typeof t.primaryLegalLink.title != "string"));
 }
 //#endregion
-export { et as C, e as D, E, y as S, D as T, ne as _, jt as a, O as b, xt as c, W as d, I as f, r as g, n as h, At as i, K as l, t as m, Lt as n, St as o, _e as p, Mt as r, Q as s, Nt as t, G as u, T as v, x as w, ve as x, k as y };
+export { E as A, k as C, et as D, y as E, x as O, T as S, ve as T, _e as _, zt as a, r as b, At as c, Q as d, xt as f, I as g, W as h, Lt as i, e as j, D as k, jt as l, G as m, Nt as n, Ut as o, K as p, Rt as r, Mt as s, Pt as t, St as u, t as v, O as w, ne as x, n as y };

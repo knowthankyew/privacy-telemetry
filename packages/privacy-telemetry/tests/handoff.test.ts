@@ -1,7 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   validateHandoffPayload,
+  encodeHandoffFragmentValue,
+  decodeHandoffFragmentValue,
+  extractHandoffFromHash,
   KTY_HANDOFF_SESSION_KEY,
+  KTY_HANDOFF_HASH_PARAM,
   KtyHandoffPayload,
 } from '../src/handoff.js';
 
@@ -86,5 +90,46 @@ describe('Handoff Schema Validation & Protocol Specification', () => {
       findings: [{ ...sampleValidPayload.findings[0], severity: 'FATAL' as any }],
     };
     expect(validateHandoffPayload(invalidSeverity)).toBe(false);
+  });
+
+  it('encodes and decodes UTF-8 handoff payloads via URL fragment helpers', () => {
+    const encoded = encodeHandoffFragmentValue(sampleValidPayload);
+    expect(encoded).toBeTruthy();
+    expect(encoded).toMatch(/^[A-Za-z0-9_-]+$/);
+
+    const decoded = decodeHandoffFragmentValue(encoded!);
+    expect(decoded).toEqual(sampleValidPayload);
+    expect(KTY_HANDOFF_SESSION_KEY).toBe('kty_handoff');
+    expect(KTY_HANDOFF_HASH_PARAM).toBe('kty_handoff');
+  });
+
+  it('fails closed on malformed or target-mismatched URL hashes', () => {
+    const encoded = encodeHandoffFragmentValue(sampleValidPayload)!;
+    expect(extractHandoffFromHash('')).toEqual({
+      payload: null,
+      hasHandoffParam: false,
+      remainingHash: '',
+    });
+    expect(extractHandoffFromHash(`#${KTY_HANDOFF_HASH_PARAM}=!!!invalid!!!`)).toEqual({
+      payload: null,
+      hasHandoffParam: true,
+      remainingHash: '',
+    });
+    expect(extractHandoffFromHash(`#${KTY_HANDOFF_HASH_PARAM}=${encoded}`, 'lease-audit')).toEqual({
+      payload: null,
+      hasHandoffParam: true,
+      remainingHash: '',
+    });
+  });
+
+  it('preserves unrelated hash parameters while extracting kty_handoff', () => {
+    const encoded = encodeHandoffFragmentValue(sampleValidPayload)!;
+    const result = extractHandoffFromHash(
+      `#section=summary&${KTY_HANDOFF_HASH_PARAM}=${encoded}&tab=remedy`,
+      'bill-of-rights-bot'
+    );
+    expect(result.hasHandoffParam).toBe(true);
+    expect(result.remainingHash).toBe('#section=summary&tab=remedy');
+    expect(result.payload).toEqual(sampleValidPayload);
   });
 });

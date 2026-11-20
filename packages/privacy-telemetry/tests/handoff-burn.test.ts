@@ -280,4 +280,53 @@ describe('useKTYHandoff hard-burn tombstone persistence across remounts', () => 
       }
     `);
   });
+
+  it('ingests #kty_handoff= URL fragment, scrubs active history via replaceState, and rejects fragments after Hard Burn', async () => {
+    await runHandoffRealmScenario(`
+      const { storageMap, createReactMock, createValidPayload } = env;
+      const { TelemetryManager, useKTYHandoff } = handoffMod;
+      const payload = createValidPayload();
+      const json = JSON.stringify(payload);
+      const token = Buffer.from(json, 'utf8')
+        .toString('base64')
+        .replace(/\\+/g, '-')
+        .replace(/\\//g, '_')
+        .replace(/=+$/, '');
+
+      const replaceCalls = [];
+      globalThis.window.location = {
+        origin: 'https://knowthankyew.github.io',
+        pathname: '/warranty-watch/',
+        search: '?kty_handoff=1',
+        hash: '#kty_handoff=' + token,
+      };
+      globalThis.window.history = {
+        replaceState: (_state, _title, nextUrl) => {
+          replaceCalls.push(nextUrl);
+          globalThis.window.location.hash = '';
+        },
+      };
+
+      const reactRunner = createReactMock();
+      const mounted1 = reactRunner.mount(() => useKTYHandoff('warranty-watch'));
+      assert.equal(mounted1.result.isHandoffActive, true);
+      assert.equal(mounted1.result.payload?.domain, 'example.com');
+      assert.deepEqual(replaceCalls, ['/warranty-watch/?kty_handoff=1']);
+      assert.equal(globalThis.window.location.hash, '');
+      assert.equal(storageMap.has('kty_handoff'), true);
+
+      const tm = new TelemetryManager({ burnEnabled: true });
+      tm.burn();
+      mounted1.unmount();
+
+      // Re-arm hash after burn: useKTYHandoff must still scrub URL and refuse payload
+      globalThis.window.location.hash = '#kty_handoff=' + token;
+      const mounted2 = reactRunner.mount(() => useKTYHandoff('warranty-watch'));
+      assert.equal(mounted2.result.payload, null);
+      assert.equal(mounted2.result.isHandoffActive, false);
+      assert.equal(globalThis.window.location.hash, '');
+      assert.equal(storageMap.has('kty_handoff'), false);
+      mounted2.unmount();
+    `);
+  });
 });

@@ -7,7 +7,8 @@ export interface UseKTYHandoffResult {
 /**
  * React hook to detect, parse, and monitor KTY handoff payloads in destination advocacy tools.
  *
- * Reads from sessionStorage['kty_handoff'] on mount.
+ * Reads from URL fragment (#kty_handoff=..., immediately scrubbed via history.replaceState)
+ * or sessionStorage['kty_handoff'] on mount.
  * Automatically clears payload state upon receiving Nuclear Hard Burn broadcast
  * via BroadcastChannel('kty_hard_burn'), postMessage, or TelemetryManager.burn().
  */

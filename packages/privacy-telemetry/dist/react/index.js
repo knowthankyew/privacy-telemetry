@@ -1,14 +1,14 @@
-import { a as e, f as t, i as n, n as r, t as i } from "../chunks/handoff-UNWns1Tc.js";
-import { useCallback as a, useEffect as o, useState as s } from "react";
-import { jsx as c, jsxs as l } from "react/jsx-runtime";
+import { a as e, c as t, g as n, l as r, n as i, o as a } from "../chunks/handoff-BoO5G6Lf.js";
+import { useCallback as o, useEffect as s, useState as c } from "react";
+import { jsx as l, jsxs as u } from "react/jsx-runtime";
 //#region src/react/usePrivacyTelemetry.ts
-function u(e, t) {
-	let [n, r] = s(() => e.getPrivacyAuditReport()), [i, c] = s(() => e.getPrivacyClaims(t)), [l, u] = s(() => e.getBufferedSpans()), d = a(() => {
-		r(e.getPrivacyAuditReport()), c(e.getPrivacyClaims(t)), u(e.getBufferedSpans());
-	}, [e, t]), f = a(() => {
+function d(e, t) {
+	let [n, r] = c(() => e.getPrivacyAuditReport()), [i, a] = c(() => e.getPrivacyClaims(t)), [l, u] = c(() => e.getBufferedSpans()), d = o(() => {
+		r(e.getPrivacyAuditReport()), a(e.getPrivacyClaims(t)), u(e.getBufferedSpans());
+	}, [e, t]), f = o(() => {
 		e.burn(), d();
 	}, [e, d]);
-	return o(() => {
+	return s(() => {
 		d();
 	}, [d]), {
 		report: n,
@@ -19,23 +19,23 @@ function u(e, t) {
 		refresh: d
 	};
 }
-function d(e, t) {
-	let [n, r] = s(() => e.getPrivacyClaims(t));
-	return o(() => {
+function f(e, t) {
+	let [n, r] = c(() => e.getPrivacyClaims(t));
+	return s(() => {
 		r(e.getPrivacyClaims(t));
 	}, [e, t]), n;
 }
 //#endregion
 //#region src/react/PrivacyAuditModal.tsx
-var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNamePrefix: a = "privacy-modal" }) => {
-	let [u, d] = s("overview"), [f, p] = s(() => n.getPrivacyAuditReport()), [m, h] = s(() => n.getPrivacyClaims(r)), [g, _] = s(() => n.getBufferedSpans()), [v, y] = s(!1);
-	return o(() => {
+var p = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNamePrefix: a = "privacy-modal" }) => {
+	let [o, d] = c("overview"), [f, p] = c(() => n.getPrivacyAuditReport()), [m, h] = c(() => n.getPrivacyClaims(r)), [g, _] = c(() => n.getBufferedSpans()), [v, y] = c(!1);
+	return s(() => {
 		e && (p(n.getPrivacyAuditReport()), h(n.getPrivacyClaims(r)), _(n.getBufferedSpans()));
 	}, [
 		e,
 		n,
 		r
-	]), e ? /* @__PURE__ */ c("div", {
+	]), e ? /* @__PURE__ */ l("div", {
 		role: "dialog",
 		"aria-modal": "true",
 		"aria-labelledby": "privacy-audit-modal-title",
@@ -50,7 +50,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 			justifyContent: "center",
 			padding: "1rem"
 		},
-		children: /* @__PURE__ */ l("div", {
+		children: /* @__PURE__ */ u("div", {
 			style: {
 				backgroundColor: "#ffffff",
 				borderRadius: "12px",
@@ -65,7 +65,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 			},
 			className: `${a}-container`,
 			children: [
-				/* @__PURE__ */ l("div", {
+				/* @__PURE__ */ u("div", {
 					style: {
 						padding: "1.25rem 1.5rem",
 						borderBottom: "1px solid #e5e7eb",
@@ -74,21 +74,21 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 						justifyContent: "space-between",
 						backgroundColor: "#f9fafb"
 					},
-					children: [/* @__PURE__ */ l("div", {
+					children: [/* @__PURE__ */ u("div", {
 						style: {
 							display: "flex",
 							alignItems: "center",
 							gap: "0.75rem"
 						},
-						children: [/* @__PURE__ */ c("svg", {
+						children: [/* @__PURE__ */ l("svg", {
 							width: "22",
 							height: "22",
 							viewBox: "0 0 24 24",
 							fill: "none",
 							stroke: "#059669",
 							strokeWidth: "2",
-							children: /* @__PURE__ */ c("path", { d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" })
-						}), /* @__PURE__ */ l("div", { children: [/* @__PURE__ */ c("h3", {
+							children: /* @__PURE__ */ l("path", { d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" })
+						}), /* @__PURE__ */ u("div", { children: [/* @__PURE__ */ l("h3", {
 							id: "privacy-audit-modal-title",
 							style: {
 								margin: 0,
@@ -97,7 +97,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 								color: "#111827"
 							},
 							children: "Privacy & Telemetry Live Audit"
-						}), /* @__PURE__ */ c("p", {
+						}), /* @__PURE__ */ l("p", {
 							style: {
 								margin: "0.15rem 0 0",
 								fontSize: "0.8rem",
@@ -105,7 +105,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 							},
 							children: "Inspect volatile memory buffers, egress policy, and allowlist redactions"
 						})] })]
-					}), /* @__PURE__ */ c("button", {
+					}), /* @__PURE__ */ l("button", {
 						onClick: t,
 						"aria-label": "Close modal",
 						style: {
@@ -116,19 +116,19 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 							padding: "0.25rem",
 							display: "flex"
 						},
-						children: /* @__PURE__ */ l("svg", {
+						children: /* @__PURE__ */ u("svg", {
 							width: "20",
 							height: "20",
 							viewBox: "0 0 24 24",
 							fill: "none",
 							stroke: "currentColor",
 							strokeWidth: "2",
-							children: [/* @__PURE__ */ c("line", {
+							children: [/* @__PURE__ */ l("line", {
 								x1: "18",
 								y1: "6",
 								x2: "6",
 								y2: "18"
-							}), /* @__PURE__ */ c("line", {
+							}), /* @__PURE__ */ l("line", {
 								x1: "6",
 								y1: "6",
 								x2: "18",
@@ -137,7 +137,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 						})
 					})]
 				}),
-				/* @__PURE__ */ c("div", {
+				/* @__PURE__ */ l("div", {
 					style: {
 						display: "flex",
 						borderBottom: "1px solid #e5e7eb",
@@ -148,23 +148,23 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 						"overview",
 						"spans",
 						"raw"
-					].map((e) => /* @__PURE__ */ c("button", {
+					].map((e) => /* @__PURE__ */ l("button", {
 						onClick: () => d(e),
 						style: {
 							padding: "0.75rem 1rem",
 							border: "none",
 							background: "none",
 							cursor: "pointer",
-							fontWeight: u === e ? 600 : 500,
-							color: u === e ? "#2563eb" : "#6b7280",
-							borderBottom: u === e ? "2px solid #2563eb" : "2px solid transparent",
+							fontWeight: o === e ? 600 : 500,
+							color: o === e ? "#2563eb" : "#6b7280",
+							borderBottom: o === e ? "2px solid #2563eb" : "2px solid transparent",
 							textTransform: "capitalize",
 							fontSize: "0.875rem"
 						},
 						children: e === "spans" ? `Spans (${g.length})` : e
 					}, e))
 				}),
-				/* @__PURE__ */ l("div", {
+				/* @__PURE__ */ u("div", {
 					style: {
 						padding: "1.5rem",
 						overflowY: "auto",
@@ -172,20 +172,20 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 						backgroundColor: "#ffffff"
 					},
 					children: [
-						u === "overview" && /* @__PURE__ */ l("div", {
+						o === "overview" && /* @__PURE__ */ u("div", {
 							style: {
 								display: "flex",
 								flexDirection: "column",
 								gap: "1rem"
 							},
-							children: [/* @__PURE__ */ l("div", {
+							children: [/* @__PURE__ */ u("div", {
 								style: {
 									padding: "1rem",
 									borderRadius: "8px",
 									backgroundColor: m.isEnterpriseBuild ? "#fef3c7" : "#ecfdf5",
 									border: `1px solid ${m.isEnterpriseBuild ? "#f59e0b" : "#10b981"}`
 								},
-								children: [/* @__PURE__ */ c("h4", {
+								children: [/* @__PURE__ */ l("h4", {
 									style: {
 										margin: 0,
 										fontSize: "0.95rem",
@@ -193,7 +193,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 										color: m.isEnterpriseBuild ? "#92400e" : "#065f46"
 									},
 									children: m.modalStatusTitle
-								}), /* @__PURE__ */ c("p", {
+								}), /* @__PURE__ */ l("p", {
 									style: {
 										margin: "0.35rem 0 0",
 										fontSize: "0.825rem",
@@ -201,7 +201,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 									},
 									children: m.modalStatusDescription
 								})]
-							}), /* @__PURE__ */ l("div", {
+							}), /* @__PURE__ */ u("div", {
 								style: {
 									display: "grid",
 									gridTemplateColumns: "repeat(2, 1fr)",
@@ -209,20 +209,20 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 									fontSize: "0.85rem"
 								},
 								children: [
-									/* @__PURE__ */ l("div", {
+									/* @__PURE__ */ u("div", {
 										style: {
 											padding: "0.75rem",
 											backgroundColor: "#f9fafb",
 											borderRadius: "6px",
 											border: "1px solid #e5e7eb"
 										},
-										children: [/* @__PURE__ */ c("div", {
+										children: [/* @__PURE__ */ l("div", {
 											style: {
 												color: "#6b7280",
 												fontSize: "0.75rem"
 											},
 											children: "Telemetry Mode"
-										}), /* @__PURE__ */ c("div", {
+										}), /* @__PURE__ */ l("div", {
 											style: {
 												fontWeight: 600,
 												color: "#111827",
@@ -231,20 +231,20 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 											children: f.telemetryMode
 										})]
 									}),
-									/* @__PURE__ */ l("div", {
+									/* @__PURE__ */ u("div", {
 										style: {
 											padding: "0.75rem",
 											backgroundColor: "#f9fafb",
 											borderRadius: "6px",
 											border: "1px solid #e5e7eb"
 										},
-										children: [/* @__PURE__ */ c("div", {
+										children: [/* @__PURE__ */ l("div", {
 											style: {
 												color: "#6b7280",
 												fontSize: "0.75rem"
 											},
 											children: "Network Egress Policy"
-										}), /* @__PURE__ */ c("div", {
+										}), /* @__PURE__ */ l("div", {
 											style: {
 												fontWeight: 600,
 												color: f.networkEgress === "deny" ? "#059669" : "#d97706",
@@ -253,20 +253,20 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 											children: f.networkEgress.toUpperCase()
 										})]
 									}),
-									/* @__PURE__ */ l("div", {
+									/* @__PURE__ */ u("div", {
 										style: {
 											padding: "0.75rem",
 											backgroundColor: "#f9fafb",
 											borderRadius: "6px",
 											border: "1px solid #e5e7eb"
 										},
-										children: [/* @__PURE__ */ c("div", {
+										children: [/* @__PURE__ */ l("div", {
 											style: {
 												color: "#6b7280",
 												fontSize: "0.75rem"
 											},
 											children: "OTLP Exporter Target"
-										}), /* @__PURE__ */ c("div", {
+										}), /* @__PURE__ */ l("div", {
 											style: {
 												fontWeight: 600,
 												color: "#111827",
@@ -276,20 +276,20 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 											children: f.otlpEndpoint || "None (Zero Egress)"
 										})]
 									}),
-									/* @__PURE__ */ l("div", {
+									/* @__PURE__ */ u("div", {
 										style: {
 											padding: "0.75rem",
 											backgroundColor: "#f9fafb",
 											borderRadius: "6px",
 											border: "1px solid #e5e7eb"
 										},
-										children: [/* @__PURE__ */ c("div", {
+										children: [/* @__PURE__ */ l("div", {
 											style: {
 												color: "#6b7280",
 												fontSize: "0.75rem"
 											},
 											children: "Buffered Spans in Memory"
-										}), /* @__PURE__ */ l("div", {
+										}), /* @__PURE__ */ u("div", {
 											style: {
 												fontWeight: 600,
 												color: "#111827",
@@ -301,7 +301,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 								]
 							})]
 						}),
-						u === "spans" && /* @__PURE__ */ c("div", { children: g.length === 0 ? /* @__PURE__ */ c("div", {
+						o === "spans" && /* @__PURE__ */ l("div", { children: g.length === 0 ? /* @__PURE__ */ l("div", {
 							style: {
 								textAlign: "center",
 								padding: "2rem",
@@ -309,13 +309,13 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 								fontSize: "0.875rem"
 							},
 							children: "No active spans buffered in volatile memory."
-						}) : /* @__PURE__ */ c("div", {
+						}) : /* @__PURE__ */ l("div", {
 							style: {
 								display: "flex",
 								flexDirection: "column",
 								gap: "0.75rem"
 							},
-							children: g.map((e) => /* @__PURE__ */ l("div", {
+							children: g.map((e) => /* @__PURE__ */ u("div", {
 								style: {
 									padding: "0.75rem",
 									borderRadius: "6px",
@@ -323,14 +323,14 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 									backgroundColor: "#f9fafb",
 									fontSize: "0.8rem"
 								},
-								children: [/* @__PURE__ */ l("div", {
+								children: [/* @__PURE__ */ u("div", {
 									style: {
 										display: "flex",
 										justifyContent: "space-between",
 										fontWeight: 600,
 										color: "#111827"
 									},
-									children: [/* @__PURE__ */ c("span", { children: e.name }), /* @__PURE__ */ l("span", {
+									children: [/* @__PURE__ */ l("span", { children: e.name }), /* @__PURE__ */ u("span", {
 										style: { color: e.status === "OK" ? "#059669" : "#dc2626" },
 										children: [
 											e.status,
@@ -339,7 +339,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 											"ms)"
 										]
 									})]
-								}), /* @__PURE__ */ c("div", {
+								}), /* @__PURE__ */ l("div", {
 									style: {
 										marginTop: "0.35rem",
 										color: "#4b5563",
@@ -350,7 +350,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 								})]
 							}, e.id))
 						}) }),
-						u === "raw" && /* @__PURE__ */ c("pre", {
+						o === "raw" && /* @__PURE__ */ l("pre", {
 							style: {
 								margin: 0,
 								padding: "1rem",
@@ -370,7 +370,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 						})
 					]
 				}),
-				/* @__PURE__ */ l("div", {
+				/* @__PURE__ */ u("div", {
 					style: {
 						padding: "1rem 1.5rem",
 						borderTop: "1px solid #e5e7eb",
@@ -379,12 +379,12 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 						justifyContent: "space-between",
 						alignItems: "center"
 					},
-					children: [/* @__PURE__ */ l("div", {
+					children: [/* @__PURE__ */ u("div", {
 						style: {
 							display: "flex",
 							gap: "0.5rem"
 						},
-						children: [/* @__PURE__ */ c("button", {
+						children: [/* @__PURE__ */ l("button", {
 							onClick: () => {
 								let e = {
 									auditTimestamp: (/* @__PURE__ */ new Date()).toISOString(),
@@ -406,7 +406,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 								fontWeight: 500
 							},
 							children: "Export JSON Audit"
-						}), /* @__PURE__ */ c("button", {
+						}), /* @__PURE__ */ l("button", {
 							onClick: () => {
 								let e = {
 									auditTimestamp: (/* @__PURE__ */ new Date()).toISOString(),
@@ -429,7 +429,7 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 							},
 							children: v ? "Copied!" : "Copy to Clipboard"
 						})]
-					}), /* @__PURE__ */ c("button", {
+					}), /* @__PURE__ */ l("button", {
 						onClick: () => {
 							n.burn(), p(n.getPrivacyAuditReport()), h(n.getPrivacyClaims(r)), _(n.getBufferedSpans()), i && i();
 						},
@@ -452,75 +452,104 @@ var f = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 };
 //#endregion
 //#region src/react/useKTYHandoff.ts
-function p(c) {
-	let [l] = s(() => ({ current: t() })), [u, d] = s(() => {
-		try {
-			if (typeof window > "u" || typeof sessionStorage > "u") return null;
-			if (t()) return sessionStorage.removeItem(i), null;
-			let e = sessionStorage.getItem(i);
-			if (!e) return null;
-			let n = JSON.parse(e);
-			if (r(n) && (!c || n.targetTool === c)) return n;
-		} catch {}
-		return null;
-	}), f = a(() => {
+function m(e) {
+	try {
+		if (typeof window > "u") return;
+		let t = `${window.location?.pathname || "/"}${window.location?.search || ""}${e}`;
+		typeof window.history?.replaceState == "function" && window.history.replaceState(null, "", t);
+	} catch {}
+}
+function h(t) {
+	try {
+		if (typeof window > "u") return null;
+		let r = typeof window.location?.hash == "string" ? window.location.hash : "", { payload: o, hasHandoffParam: s, remainingHash: c } = e(r, t);
+		if (s && m(c), n()) return typeof sessionStorage < "u" && sessionStorage.removeItem(i), null;
+		if (o) {
+			if (typeof sessionStorage < "u") try {
+				sessionStorage.setItem(i, JSON.stringify(o));
+			} catch {}
+			return o;
+		}
+		if (typeof sessionStorage > "u") return null;
+		let l = sessionStorage.getItem(i);
+		if (!l) return null;
+		let u = JSON.parse(l);
+		if (a(u) && (!t || u.targetTool === t)) return u;
+	} catch {}
+	return null;
+}
+function g(l) {
+	let [u] = c(() => ({ current: n() })), [d, f] = c(() => h(l)), p = o(() => {
 		try {
 			typeof sessionStorage < "u" && sessionStorage.removeItem(i);
 		} catch {}
-	}, []), p = a(() => {
-		d(null), f();
-	}, [f]), m = a(() => {
-		l.current = !0, d(null), f();
-	}, [l, f]), h = a(() => {
-		m(), n();
-	}, [m]);
-	return o(() => {
-		(t() || l.current) && m();
-		let n = e(m), a = null;
+	}, []), g = o(() => {
+		f(null), p();
+	}, [p]), _ = o(() => {
+		u.current = !0, f(null), p();
+	}, [u, p]), v = o(() => {
+		_(), t();
+	}, [_]);
+	return s(() => {
+		(n() || u.current) && _();
+		let t = r(_), o = null;
 		if (typeof BroadcastChannel < "u") try {
-			a = new BroadcastChannel("kty_hard_burn"), a.onmessage = (e) => {
-				e?.data?.type === "KTY_HARD_BURN_DOM" && h();
+			o = new BroadcastChannel("kty_hard_burn"), o.onmessage = (e) => {
+				e?.data?.type === "KTY_HARD_BURN_DOM" && v();
 			};
 		} catch {}
-		let o = (e) => {
+		let s = (e) => {
 			if (typeof window > "u") return;
-			let n = window.location?.origin;
-			if (e?.source === window && typeof n == "string" && n.length !== 0 && n !== "null" && e.origin === n) {
+			let t = window.location?.origin;
+			if (e?.source === window && typeof t == "string" && t.length !== 0 && t !== "null" && e.origin === t) {
 				if (e?.data?.type === "KTY_HARD_BURN_DOM") {
-					h();
+					v();
 					return;
 				}
 				if (e?.data?.type === "KTY_HANDOFF_PAYLOAD") {
-					if (l.current || t()) {
-						l.current = !0, f();
+					if (u.current || n()) {
+						u.current = !0, p();
 						return;
 					}
-					let n = e.data?.payload;
-					if (r(n) && (!c || n.targetTool === c)) {
-						d(n);
+					let t = e.data?.payload;
+					if (a(t) && (!l || t.targetTool === l)) {
+						f(t);
 						try {
-							sessionStorage.setItem(i, JSON.stringify(n));
+							sessionStorage.setItem(i, JSON.stringify(t));
 						} catch {}
 					}
 				}
 			}
+		}, c = () => {
+			if (typeof window > "u") return;
+			let t = typeof window.location?.hash == "string" ? window.location.hash : "", { payload: r, hasHandoffParam: a, remainingHash: o } = e(t, l);
+			if (a && m(o), u.current || n()) {
+				u.current = !0, p();
+				return;
+			}
+			if (r) {
+				f(r);
+				try {
+					typeof sessionStorage < "u" && sessionStorage.setItem(i, JSON.stringify(r));
+				} catch {}
+			}
 		};
-		return typeof window < "u" && window.addEventListener("message", o), () => {
-			if (n(), a) try {
-				a.close();
+		return typeof window < "u" && (window.addEventListener("message", s), window.addEventListener("hashchange", c)), () => {
+			if (t(), o) try {
+				o.close();
 			} catch {}
-			typeof window < "u" && window.removeEventListener("message", o);
+			typeof window < "u" && (window.removeEventListener("message", s), window.removeEventListener("hashchange", c));
 		};
 	}, [
-		h,
+		v,
+		u,
 		l,
-		c,
-		f
+		p
 	]), {
-		payload: u,
-		isHandoffActive: u !== null,
-		clearHandoff: p
+		payload: d,
+		isHandoffActive: d !== null,
+		clearHandoff: g
 	};
 }
 //#endregion
-export { f as PrivacyAuditModal, p as useKTYHandoff, d as usePrivacyClaims, u as usePrivacyTelemetry };
+export { p as PrivacyAuditModal, g as useKTYHandoff, f as usePrivacyClaims, d as usePrivacyTelemetry };

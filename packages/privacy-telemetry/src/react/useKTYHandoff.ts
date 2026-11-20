@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   KtyHandoffPayload,
   KTY_HANDOFF_SESSION_KEY,
+  extractHandoffFromHash,
   validateHandoffPayload,
 } from '../handoff.js';
 import { isHardBurned, markHardBurned, onHardBurn } from '../manager.js';
@@ -12,10 +13,77 @@ export interface UseKTYHandoffResult {
   clearHandoff: () => void;
 }
 
+function scrubHandoffHashFromUrl(remainingHash: string): void {
+  try {
+    if (typeof window === 'undefined') return;
+    const pathname = window.location?.pathname || '/';
+    const search = window.location?.search || '';
+    const nextUrl = `${pathname}${search}${remainingHash}`;
+    if (typeof window.history?.replaceState === 'function') {
+      window.history.replaceState(null, '', nextUrl);
+    }
+  } catch {
+    // Non-fatal in restricted browser/test contexts
+  }
+}
+
+function readInitialHandoffPayload(expectedTargetTool?: string): KtyHandoffPayload | null {
+  try {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const hash = typeof window.location?.hash === 'string' ? window.location.hash : '';
+    const { payload: hashPayload, hasHandoffParam, remainingHash } = extractHandoffFromHash(
+      hash,
+      expectedTargetTool
+    );
+
+    if (hasHandoffParam) {
+      // Scrub fragment immediately so URL bar and active history entry do not retain the payload
+      scrubHandoffHashFromUrl(remainingHash);
+    }
+
+    if (isHardBurned()) {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.removeItem(KTY_HANDOFF_SESSION_KEY);
+      }
+      return null;
+    }
+
+    if (hashPayload) {
+      if (typeof sessionStorage !== 'undefined') {
+        try {
+          sessionStorage.setItem(KTY_HANDOFF_SESSION_KEY, JSON.stringify(hashPayload));
+        } catch {
+          // Non-fatal if sessionStorage restricted
+        }
+      }
+      return hashPayload;
+    }
+
+    if (typeof sessionStorage === 'undefined') {
+      return null;
+    }
+    const raw = sessionStorage.getItem(KTY_HANDOFF_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (validateHandoffPayload(parsed)) {
+      if (!expectedTargetTool || parsed.targetTool === expectedTargetTool) {
+        return parsed;
+      }
+    }
+  } catch {
+    // Non-fatal (e.g. SecurityError on storage access in restricted contexts)
+  }
+  return null;
+}
+
 /**
  * React hook to detect, parse, and monitor KTY handoff payloads in destination advocacy tools.
  *
- * Reads from sessionStorage['kty_handoff'] on mount.
+ * Reads from URL fragment (#kty_handoff=..., immediately scrubbed via history.replaceState)
+ * or sessionStorage['kty_handoff'] on mount.
  * Automatically clears payload state upon receiving Nuclear Hard Burn broadcast
  * via BroadcastChannel('kty_hard_burn'), postMessage, or TelemetryManager.burn().
  */
@@ -23,28 +91,9 @@ export function useKTYHandoff(expectedTargetTool?: string): UseKTYHandoffResult 
   // Use useState ref cell instead of useRef so destination app unit tests mocking
   // only { useState, useEffect, useCallback } execute without harness changes.
   const [burnedRef] = useState(() => ({ current: isHardBurned() }));
-  const [payload, setPayload] = useState<KtyHandoffPayload | null>(() => {
-    try {
-      if (typeof window === 'undefined' || typeof sessionStorage === 'undefined') {
-        return null;
-      }
-      if (isHardBurned()) {
-        sessionStorage.removeItem(KTY_HANDOFF_SESSION_KEY);
-        return null;
-      }
-      const raw = sessionStorage.getItem(KTY_HANDOFF_SESSION_KEY);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (validateHandoffPayload(parsed)) {
-        if (!expectedTargetTool || parsed.targetTool === expectedTargetTool) {
-          return parsed;
-        }
-      }
-    } catch {
-      // Non-fatal (e.g. SecurityError on storage access in restricted contexts)
-    }
-    return null;
-  });
+  const [payload, setPayload] = useState<KtyHandoffPayload | null>(() =>
+    readInitialHandoffPayload(expectedTargetTool)
+  );
 
   const scrubHandoffStorage = useCallback(() => {
     try {
@@ -136,8 +185,36 @@ export function useKTYHandoff(expectedTargetTool?: string): UseKTYHandoffResult 
       }
     };
 
+    const handleHashChange = () => {
+      if (typeof window === 'undefined') return;
+      const hash = typeof window.location?.hash === 'string' ? window.location.hash : '';
+      const { payload: incoming, hasHandoffParam, remainingHash } = extractHandoffFromHash(
+        hash,
+        expectedTargetTool
+      );
+      if (hasHandoffParam) {
+        scrubHandoffHashFromUrl(remainingHash);
+      }
+      if (burnedRef.current || isHardBurned()) {
+        burnedRef.current = true;
+        scrubHandoffStorage();
+        return;
+      }
+      if (incoming) {
+        setPayload(incoming);
+        try {
+          if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem(KTY_HANDOFF_SESSION_KEY, JSON.stringify(incoming));
+          }
+        } catch {
+          // Non-fatal
+        }
+      }
+    };
+
     if (typeof window !== 'undefined') {
       window.addEventListener('message', handleMessage);
+      window.addEventListener('hashchange', handleHashChange);
     }
 
     return () => {
@@ -149,6 +226,7 @@ export function useKTYHandoff(expectedTargetTool?: string): UseKTYHandoffResult 
       }
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleMessage);
+        window.removeEventListener('hashchange', handleHashChange);
       }
     };
   }, [applyHardBurn, burnedRef, expectedTargetTool, scrubHandoffStorage]);
