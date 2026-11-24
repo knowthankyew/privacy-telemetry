@@ -1,6 +1,6 @@
 <!-- diagram-meta
-  last-validated: 2026-11-20
-  validated-commit: c94130c
+  last-validated: 2026-11-24
+  validated-commit: 2fc2bc4
   covers: [packages/**]
   generated-by: manual
 -->
