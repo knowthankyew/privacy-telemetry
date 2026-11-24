@@ -1,7 +1,7 @@
-import { a as e, c as t, g as n, l as r, n as i, o as a } from "../chunks/handoff-BoO5G6Lf.js";
+import { a as e, c as t, g as n, l as r, n as i, o as a } from "../chunks/handoff-BWF4gglc.js";
 import { useCallback as o, useEffect as s, useState as c } from "react";
 import { jsx as l, jsxs as u } from "react/jsx-runtime";
-//#region src/react/usePrivacyTelemetry.ts
+// src/react/usePrivacyTelemetry.ts
 function d(e, t) {
 	let [n, r] = c(() => e.getPrivacyAuditReport()), [i, a] = c(() => e.getPrivacyClaims(t)), [l, u] = c(() => e.getBufferedSpans()), d = o(() => {
 		r(e.getPrivacyAuditReport()), a(e.getPrivacyClaims(t)), u(e.getBufferedSpans());
@@ -25,8 +25,7 @@ function f(e, t) {
 		r(e.getPrivacyClaims(t));
 	}, [e, t]), n;
 }
-//#endregion
-//#region src/react/PrivacyAuditModal.tsx
+// src/react/PrivacyAuditModal.tsx
 var p = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNamePrefix: a = "privacy-modal" }) => {
 	let [o, d] = c("overview"), [f, p] = c(() => n.getPrivacyAuditReport()), [m, h] = c(() => n.getPrivacyClaims(r)), [g, _] = c(() => n.getBufferedSpans()), [v, y] = c(!1);
 	return s(() => {
@@ -450,8 +449,7 @@ var p = ({ isOpen: e, onClose: t, telemetry: n, branding: r, onBurn: i, classNam
 		})
 	}) : null;
 };
-//#endregion
-//#region src/react/useKTYHandoff.ts
+// src/react/useKTYHandoff.ts
 function m(e) {
 	try {
 		if (typeof window > "u") return;
@@ -502,11 +500,8 @@ function g(l) {
 			if (typeof window > "u") return;
 			let t = window.location?.origin;
 			if (e?.source === window && typeof t == "string" && t.length !== 0 && t !== "null" && e.origin === t) {
-				if (e?.data?.type === "KTY_HARD_BURN_DOM") {
-					v();
-					return;
-				}
-				if (e?.data?.type === "KTY_HANDOFF_PAYLOAD") {
+				if (e?.data?.type === "KTY_HARD_BURN_DOM") v();
+				else if (e?.data?.type === "KTY_HANDOFF_PAYLOAD") {
 					if (u.current || n()) {
 						u.current = !0, p();
 						return;
@@ -523,11 +518,8 @@ function g(l) {
 		}, c = () => {
 			if (typeof window > "u") return;
 			let t = typeof window.location?.hash == "string" ? window.location.hash : "", { payload: r, hasHandoffParam: a, remainingHash: o } = e(t, l);
-			if (a && m(o), u.current || n()) {
-				u.current = !0, p();
-				return;
-			}
-			if (r) {
+			if (a && m(o), u.current || n()) u.current = !0, p();
+			else if (r) {
 				f(r);
 				try {
 					typeof sessionStorage < "u" && sessionStorage.setItem(i, JSON.stringify(r));
@@ -551,5 +543,4 @@ function g(l) {
 		clearHandoff: g
 	};
 }
-//#endregion
 export { p as PrivacyAuditModal, g as useKTYHandoff, f as usePrivacyClaims, d as usePrivacyTelemetry };

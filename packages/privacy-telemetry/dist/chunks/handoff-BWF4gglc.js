@@ -1,4 +1,4 @@
-//#region src/sha256.ts
+// src/sha256.ts
 function e(e) {
 	function t(e, t) {
 		return e >>> t | e << 32 - t;
@@ -39,8 +39,7 @@ function e(e) {
 	}
 	return o;
 }
-//#endregion
-//#region src/allowlist.ts
+// src/allowlist.ts
 var t = /* @__PURE__ */ new Set(/* @__PURE__ */ "rule_id.rule_ids.statute_code.jurisdiction.status.risk_level.duration_ms.duration_sec.clause_count.total_clauses.flagged_clauses.flagged_count.standard_count.watch_count.unenforceable_count.char_count.matched_violations.error_code.job_id.service.action.step.current_step.total_steps.progress_pct.loss.device.adapter_size_bytes.base_model.dataset_hash.exchange.routing_key".split(".")), n = "[REDACTED_BY_DEFAULT_ALLOWLIST]", r = "[REDACTED_SENSITIVE_VALUE]", i = 256, a = 4096, o = 50, s = 3600, c = /[\r\n\x00-\x1f\x7f]/, l = /[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9.-]{1,128}\.[A-Za-z]{2,24}/, u = /(?:^|\D)(?:\d{3}-\d{2}-\d{4}|\d{9})(?!\d)/, d = /(?:^|\D)(?:\d{4}[- ]\d{4}[- ]\d{4}[- ]\d{1,4}|3[47]\d{2}[- ]?\d{6}[- ]?\d{5})(?!\d)/, f = /(?:^|\D)(4\d{12}(?:\d{3})?(?:\d{3})?|(?:5[1-5]\d{2}|2(?:22[1-9]|2[3-9]\d|[3-6]\d{2}|7[01]\d|720))\d{12}|3[47]\d{13}|(?:6011|65\d{2}|64[4-9]\d)\d{12}(?:\d{3})?)(?!\d)/g, p = /\bBearer\s+[A-Za-z0-9\-._~+/]{1,200}={0,4}|(?:^|[^A-Za-z0-9])(?:sk-[A-Za-z0-9_-]{16,128}|ghp_[A-Za-z0-9]{20,128}|eyJ[A-Za-z0-9_-]{4,128}\.[A-Za-z0-9_-]{4,128}\.[A-Za-z0-9_-]{4,128})\b/i, m = /(?:^|[\s"'(=]|file:(?:\/\/(?:localhost)?)?)(?:\/(?:Users|home|tmp|var|private)\/[^\s"')]{1,200}|\/?[A-Za-z]:[\\/]Users[\\/][^\s"')]{1,200})/i, h = /^(?:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|(?!\d{13,19}$)[0-9a-fA-F]{16,64}|hmac:[a-f0-9]{16,64}|sha256:[a-f0-9]{64}|(?:job|test-job|run|task|j)[-_](?:[0-9]{1,8}|(?!\d{13,19}$)[0-9a-fA-F]{16,64}|hmac:[a-f0-9]{16,64}|sha256:[a-f0-9]{64}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))$/, g = /^(?:(?:job|test-job|run|task|j)[-_])?(?:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|(?!\d{13,19}$)[0-9a-fA-F]{16,64}|hmac:[a-f0-9]{16,64}|sha256:[a-f0-9]{64})$/, _ = /^(?:hmac:[a-f0-9]{16,64}|sha256:[a-f0-9]{64})$/, ee = /^hmac:[a-f0-9]{16,64}$/, te = /^(?:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-fA-F]{12,64}|(?:hmac|sha256):[a-f0-9]{16,64})$/, ne = "[REDACTED_KEY]", re = /* @__PURE__ */ "AL.AK.AZ.AR.CA.CO.CT.DE.DC.FL.GA.HI.ID.IL.IN.IA.KS.KY.LA.ME.MD.MA.MI.MN.MS.MO.MT.NE.NV.NH.NJ.NM.NY.NC.ND.OH.OK.OR.PA.RI.SC.SD.TN.TX.UT.VT.VA.WA.WV.WI.WY".split("."), ie = /* @__PURE__ */ new Set([
 	"AR-001",
 	"AR-002",
@@ -544,39 +543,26 @@ function k(e, a) {
 				}
 				let h = o?.has(e) ?? !1;
 				if (typeof u == "number") {
-					if (!Number.isFinite(u)) {
-						c[p] = r;
-						continue;
-					}
-					if (h && !a) {
+					if (!Number.isFinite(u) || h && !a) {
 						c[p] = r;
 						continue;
 					}
 					let t = w(e);
 					c[p] = a || t === "numeric" ? u : r;
-					continue;
-				}
-				if (typeof u == "boolean") {
+				} else if (typeof u == "boolean") {
 					if (h && !a) {
 						c[p] = r;
 						continue;
 					}
 					let t = w(e);
 					c[p] = a || t === "boolean" || t === "custom" ? u : r;
-					continue;
-				}
-				if (Array.isArray(u) && e === "rule_ids") {
-					c[p] = Ze(u, a, o);
-					continue;
-				}
-				c[p] = r;
+				} else c[p] = Array.isArray(u) && e === "rule_ids" ? Ze(u, a, o) : r;
 			}
 			return a || ye(c), c;
 		}
 	};
 }
-//#endregion
-//#region src/tombstone.ts
+// src/tombstone.ts
 var A = Symbol.for("knowthankyew.privacyTelemetry.realmState.v1"), j = Symbol.for("knowthankyew.privacyTelemetry.liveExporters.v1"), M = Symbol.for("knowthankyew.privacyTelemetry.liveAliases.v1"), tt = Symbol.for("knowthankyew.privacyTelemetry.exportOwnedSpan.v1");
 function N(e) {
 	return typeof WeakRef < "u" ? new WeakRef(e) : { deref: () => e };
@@ -700,11 +686,8 @@ function R(e, t, n) {
 	let r = !1, i;
 	for (let a of [...e]) {
 		let o = a.deref();
-		if (!o) {
-			e.delete(a);
-			continue;
-		}
-		if (n === void 0 || o !== n) try {
+		if (!o) e.delete(a);
+		else if (n === void 0 || o !== n) try {
 			t.get(o)?.(o);
 		} catch (e) {
 			r || (r = !0, i = e);
@@ -786,8 +769,7 @@ function ct() {
 	let { refs: e, wipers: t } = z();
 	return R(e, t);
 }
-//#endregion
-//#region src/exporter.ts
+// src/exporter.ts
 var lt = /^[0-9a-f]{32}$/, ut = /^[0-9a-f]{16}$/, H = "00000000000000000000000000000000", U = "0000000000000000";
 function dt(t) {
 	let n = typeof t == "string" ? t.trim() : "", r = n.toLowerCase(), i = lt.test(r) && r !== H ? r : e(`kty:trace:${n || "fallback"}`).slice(0, 32);
@@ -828,7 +810,7 @@ function W(e) {
 		let c = Object.getOwnPropertyDescriptor(e, o);
 		if (c) {
 			let e = "value" in c && (c.value === "[REDACTED_SENSITIVE_VALUE]" || c.value === "[REDACTED_BY_DEFAULT_ALLOWLIST]"), r = typeof o == "string" && (o === "[REDACTED_KEY]" || t.has(o));
-			(!e || !r) && (n = !1);
+			e && r || (n = !1);
 		}
 	} catch {
 		n = !1;
@@ -992,11 +974,8 @@ function vt(e) {
 	if (!n) throw Error("Telemetry burn could not scrub immutable retained span data.");
 }
 function yt(e) {
-	if (W(e)) {
-		V(e);
-		return;
-	}
-	throw Error("Telemetry burn could not scrub immutable retained span data.");
+	if (W(e)) V(e);
+	else throw Error("Telemetry burn could not scrub immutable retained span data.");
 }
 var X = class {
 	aliasWiper;
@@ -1090,26 +1069,25 @@ var Q = class {
 	}
 	enqueueSpan(e, t) {
 		if (!(this.isClearing || I())) {
-			if (t && (this.trackSpanRecord(e), I())) {
-				this.hasRetainedState() && this.clear();
-				return;
-			}
-			if (!Object.isExtensible(this.spans)) {
-				this.spanArrayTracker.track(this.spans);
-				let t = [...this.spans];
-				if (I()) {
-					for (let e of t) try {
-						Y(e);
-					} catch {}
-					try {
-						Y(e);
-					} catch {}
-					this.hasRetainedState() && this.clear();
-					return;
+			if (t && (this.trackSpanRecord(e), I())) this.hasRetainedState() && this.clear();
+			else {
+				if (!Object.isExtensible(this.spans)) {
+					this.spanArrayTracker.track(this.spans);
+					let t = [...this.spans];
+					if (I()) {
+						for (let e of t) try {
+							Y(e);
+						} catch {}
+						try {
+							Y(e);
+						} catch {}
+						this.hasRetainedState() && this.clear();
+						return;
+					}
+					this.spans = t;
 				}
-				this.spans = t;
+				this.spans.push(e), this.spans.length > this.maxCapacity && this.spans.shift();
 			}
-			this.spans.push(e), this.spans.length > this.maxCapacity && this.spans.shift();
 		}
 	}
 	sanitizeStandaloneSpan(e, t) {
@@ -1354,11 +1332,7 @@ var Q = class {
 			return;
 		}
 		let n = (t?.allowRawPayloads ?? this.allowRawPayloads) === !0, r = this.sanitizeStandaloneSpan(e, n);
-		if (I()) {
-			this.hasRetainedState() && this.clear();
-			return;
-		}
-		this.enqueueSpan(r, !1);
+		I() ? this.hasRetainedState() && this.clear() : this.enqueueSpan(r, !1);
 	}
 	[tt](e) {
 		this.enqueueSpan(e, !1);
@@ -1399,11 +1373,8 @@ var Q = class {
 				}
 				for (let n of [...this.spanArrayTracker.refs]) {
 					let i = n.deref();
-					if (!i) {
-						this.spanArrayTracker.untrack(n);
-						continue;
-					}
-					try {
+					if (!i) this.spanArrayTracker.untrack(n);
+					else try {
 						let o = i === e ? t : a(i), s = -1;
 						try {
 							s = i.length;
@@ -1417,19 +1388,12 @@ var Q = class {
 				}
 				for (let e of [...this.spanTracker.refs]) {
 					let t = e.deref();
-					if (!t) {
-						this.spanTracker.untrack(e);
-						continue;
-					}
-					i(t) && this.spanTracker.untrack(e, t);
+					t ? i(t) && this.spanTracker.untrack(e, t) : this.spanTracker.untrack(e);
 				}
 				for (let e of [...this.eventArrayTracker.refs]) {
 					let n = e.deref();
-					if (!n) {
-						this.eventArrayTracker.untrack(e);
-						continue;
-					}
-					try {
+					if (!n) this.eventArrayTracker.untrack(e);
+					else try {
 						let i = J(n, r);
 						i || (t = !1), i && n.length === 0 && this.eventArrayTracker.untrack(e, n);
 					} catch (e) {
@@ -1438,19 +1402,12 @@ var Q = class {
 				}
 				for (let e of [...this.eventTracker.refs]) {
 					let n = e.deref();
-					if (!n) {
-						this.eventTracker.untrack(e);
-						continue;
-					}
-					q(n, r) ? this.eventTracker.untrack(e, n) : t = !1;
+					n ? q(n, r) ? this.eventTracker.untrack(e, n) : t = !1 : this.eventTracker.untrack(e);
 				}
 				for (let e of [...this.childRecordTracker.refs]) {
 					let n = e.deref();
-					if (!n) {
-						this.childRecordTracker.untrack(e);
-						continue;
-					}
-					try {
+					if (!n) this.childRecordTracker.untrack(e);
+					else try {
 						W(n) ? this.childRecordTracker.untrack(e, n) : t = !1;
 					} catch (e) {
 						r(e);
@@ -1496,8 +1453,7 @@ async function xt(e, t, n = "knowthankyew-app", r, i = !1, a, o, s) {
 		});
 	} catch {}
 }
-//#endregion
-//#region src/claims.ts
+// src/claims.ts
 function St(e, t) {
 	return e.isLocalOnlyHonest ? {
 		isLocalOnlyHonest: !0,
@@ -1525,8 +1481,7 @@ function St(e, t) {
 		otlpEndpoint: e.otlpEndpoint
 	};
 }
-//#endregion
-//#region src/manager.ts
+// src/manager.ts
 var Ct = 500, wt = {
 	document_ingested: "Local document ingested for analysis",
 	rules_evaluated: "Compliance rules evaluated locally",
@@ -1569,11 +1524,8 @@ function Tt(e) {
 	if (!t.ok) throw Error("Telemetry burn could not scrub immutable retained audit record.");
 }
 function Et(e) {
-	if (W(e)) {
-		V(e);
-		return;
-	}
-	throw Error("Telemetry burn could not scrub immutable retained audit record.");
+	if (W(e)) V(e);
+	else throw Error("Telemetry burn could not scrub immutable retained audit record.");
 }
 function Dt() {
 	let { hardBurnListeners: e } = F();
@@ -1702,11 +1654,8 @@ var Mt = class e {
 		} catch {}
 		for (let e of [...this.issuedAuditRecordRefs]) {
 			let n = e.deref();
-			if (!n) {
-				this.issuedAuditRecordRefs.delete(e);
-				continue;
-			}
-			try {
+			if (!n) this.issuedAuditRecordRefs.delete(e);
+			else try {
 				let r = $(n);
 				r.ok && r.error === void 0 ? (this.issuedAuditRecordRefs.delete(e), this.issuedAuditRecordFinalizer?.unregister(n), V(n)) : (t = !1, r.error !== void 0 && i(r.error));
 			} catch (e) {
@@ -1715,11 +1664,8 @@ var Mt = class e {
 		}
 		for (let e of [...this.issuedAuditDetailsRefs]) {
 			let n = e.deref();
-			if (!n) {
-				this.issuedAuditDetailsRefs.delete(e);
-				continue;
-			}
-			try {
+			if (!n) this.issuedAuditDetailsRefs.delete(e);
+			else try {
 				W(n) ? (this.issuedAuditDetailsRefs.delete(e), this.issuedAuditDetailsFinalizer?.unregister(n), V(n)) : t = !1;
 			} catch (e) {
 				i(e);
@@ -1738,11 +1684,8 @@ var Mt = class e {
 		let e, t = !1;
 		for (let n of [...this.pendingSpanCaptureRefs]) {
 			let r = n.deref();
-			if (!r) {
-				this.pendingSpanCaptureRefs.delete(n);
-				continue;
-			}
-			try {
+			if (!r) this.pendingSpanCaptureRefs.delete(n);
+			else try {
 				this.scrubPendingSpanCapture(r);
 			} catch (n) {
 				t ||= (e = n, !0);
@@ -1946,11 +1889,7 @@ function zt(e, t) {
 	let r = n.split("&").filter(Boolean), i = null, a = [];
 	for (let e of r) {
 		let t = e.indexOf("=");
-		if ((t === -1 ? e : e.slice(0, t)) === "kty_handoff") {
-			i === null && t !== -1 && (i = e.slice(t + 1));
-			continue;
-		}
-		a.push(e);
+		(t === -1 ? e : e.slice(0, t)) === "kty_handoff" ? i === null && t !== -1 && (i = e.slice(t + 1)) : a.push(e);
 	}
 	if (!n.split("&").some((e) => e === "kty_handoff" || e.startsWith("kty_handoff="))) return {
 		payload: null,
@@ -1998,5 +1937,4 @@ function Ut(e) {
 	for (let e of t.findings) if (!e || typeof e != "object" || typeof e.ruleId != "string" || e.ruleId.trim().length === 0 || typeof e.title != "string" || e.title.trim().length === 0 || !Bt.has(e.category) || !Vt.has(e.severity) || typeof e.statuteCode != "string" || typeof e.statuteTitle != "string" || typeof e.matchedSnippet != "string" || typeof e.explanation != "string" || typeof e.recommendation != "string") return !1;
 	return !(typeof t.targetTool != "string" || !Ht.has(t.targetTool) || t.primaryLegalLink !== null && (!t.primaryLegalLink || typeof t.primaryLegalLink != "object" || typeof t.primaryLegalLink.url != "string" || typeof t.primaryLegalLink.title != "string"));
 }
-//#endregion
 export { E as A, k as C, et as D, y as E, x as O, T as S, ve as T, _e as _, zt as a, r as b, At as c, Q as d, xt as f, I as g, W as h, Lt as i, e as j, D as k, jt as l, G as m, Nt as n, Ut as o, K as p, Rt as r, Mt as s, Pt as t, St as u, t as v, O as w, ne as x, n as y };
